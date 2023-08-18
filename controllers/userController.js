@@ -48,7 +48,7 @@ const verifyOtp = async(req,res,next)=>{
         const otpData = req.body
         console.log("at controller ", otpData);
         const { otp, otpToken } = otpData;
-
+          
         const otpVerified = compareOtp(otpData);
         if (!otpVerified)
           return res.status(400).json({

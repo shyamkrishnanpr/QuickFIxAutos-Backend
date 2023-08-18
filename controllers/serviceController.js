@@ -87,15 +87,16 @@ const login = async (req, res, next) => {
     console.log("data in login", email,password);
 
     let vendor = await VendorModel.findOne({email:email})
+    console.log(vendor)
     if(!vendor){
       console.log("invalid email")
-    }
+    } 
     let verified = bcrypt.compareSync(password,vendor.password)
     if(!verified){
       console.log("incorrect password")
     }
 
-    const token = jwt.sign({fullName:vendor.fullName,email:vendor.email},secretKey)
+    const token = jwt.sign({fullName:vendor.fullName,email:vendor.email,id:vendor._id},secretKey)
      
     return res.json({
       _id:vendor._id,
@@ -111,5 +112,17 @@ const login = async (req, res, next) => {
   }
 };
 
-export { signUp, verifyOtp, login };
+
+const vendorData = async(req,res,next)=>{
+  try {
+    
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+export { signUp, verifyOtp, login, vendorData };
   
