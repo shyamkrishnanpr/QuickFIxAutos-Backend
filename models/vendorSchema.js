@@ -18,11 +18,19 @@ const vendorSchema = new Schema({
         type:Boolean,
         default:false
     },
+    centerName:{
+        type:String
+    },
+    latitude:{
+      type:Number
+    },
+    longitude:{
+        type:Number
+    },
+
     address:[
         {
-            centerName:{
-                type:String
-            },
+            
             area:{
                 type:String
             },

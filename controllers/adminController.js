@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import CategoryModel from '../models/categorySchema.js'
 import SubCategoryModel from '../models/subCategorySchema.js';
 import VehicleModel from '../models/vehicleSchema.js';
+import UserModel from '../models/userSchema.js';
 import { response } from 'express';
 import fs from 'fs'
 
@@ -207,6 +208,18 @@ const deleteVehicle = async(req,res,next)=>{
     }
 }
 
+const fetchUsers = async(req,res,next)=>{
+    try {
+        const users = await UserModel.find()
+        res.json(
+            users
+        )
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 export{
     login,
@@ -220,5 +233,6 @@ export{
     editSubCategory,
     addVehicle,
     vehicles,
-    deleteVehicle
+    deleteVehicle,
+    fetchUsers
 }

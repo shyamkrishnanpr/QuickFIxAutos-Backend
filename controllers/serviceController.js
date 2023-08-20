@@ -13,7 +13,7 @@ const secretKey = process.env.JWT_SECRET;
 const signUp = async (req, res, next) => {
   try {
     let vendor = await VendorModel.findOne({
-      $or: [{ email: req.body.email }, { phoneNumber: req.body.phone }],
+      $or: [{ email: req.body.email }, { phoneNumber: req.body.phoneNumber }],
     });
     if (vendor) {
       console.log("vendor exists");
@@ -23,9 +23,9 @@ const signUp = async (req, res, next) => {
       });
     }
 
-    const { fullName, email, password, phone } = req.body;
+    const { fullName, email, password, phoneNumber } = req.body;
 
-    vendor = { fullName, email, password, phone };
+    vendor = { fullName, email, password, phoneNumber };
     console.log(vendor);
 
     const salt = await bcrypt.genSalt(10);
@@ -61,12 +61,13 @@ const verifyOtp = async (req, res, next) => {
       fullName: tokenData.fullName,
       email: tokenData.email,
       password: tokenData.password,
+      phoneNumber:tokenData.phoneNumber
     });
 
     await vendor.save();
 
     const token = jwt.sign(
-      { fullname: vendor.fullName, email: vendor.email },
+      { fullname: vendor.fullName, email: vendor.email,id:vendor._id },
       secretKey
     );
 
@@ -80,6 +81,21 @@ const verifyOtp = async (req, res, next) => {
     console.log(error);
   }
 };
+
+const resendOtp = async(req,res,next)=>{
+  const {otpToken} = req.body
+  const data = jwt.decode(otpToken)
+  const { fullName, email, password, phoneNumber } = data
+
+  const vendor = { fullName, email, password, phoneNumber }
+
+  mailOtpGenerator(vendor).then((response)=>{
+    res.json({
+        token:response
+
+    })
+})
+}
 
 const login = async (req, res, next) => {
   try {
@@ -106,23 +122,55 @@ const login = async (req, res, next) => {
     })
 
 
-
   } catch (error) {
     console.log(error);
   }
 };
-
+   
 
 const vendorData = async(req,res,next)=>{
   try {
-    
-    
+    const id = req.params.id
+    const vendorData = await VendorModel.findById(id).select('-password')
+       
+    res.json(
+      vendorData   
+    ) 
+
   } catch (error) {
-    console.log(error)
+    console.log("in cntrlle",error)
+  }
+}
+
+const updateProfile = async(req,res,next)=>{
+  try {
+    const id = req.params.id
+    console.log("in cntrlr",id)
+    const updatedData = req.body;
+    console.log("updated data is ",updatedData)
+    console.log("Address Data:", updatedData.address);
+
+    const vendor = await VendorModel.findById(id)
+
+    vendor.fullName = updatedData.fullName
+    vendor.centerName = updatedData.centerName
+    vendor.latitude = updatedData.latitude
+    vendor.longitude = updatedData.longitude
+    vendor.address = updatedData.address;
+
+    await vendor.save()
+
+    res.json({ success: true, message: "Profile updated successfully" });
+ 
+
+
+  } catch (error) {
+    console.log("error in contrlr",error)
   }
 }
 
 
 
-export { signUp, verifyOtp, login, vendorData };
+
+export { signUp, verifyOtp, login, vendorData ,updateProfile,resendOtp};
   
