@@ -1,4 +1,7 @@
 import VendorModel from "../models/vendorSchema.js";
+import CategoryModel from "../models/categorySchema.js";
+import SubCategoryModel from "../models/subCategorySchema.js";
+import VehicleModel from "../models/vehicleSchema.js";
 import bcrypt from "bcrypt";
 import { genSalt } from "bcrypt";
 import { mailOtpGenerator } from "../helpers/nodeMailer/mailOtpGenerator.js";
@@ -61,13 +64,13 @@ const verifyOtp = async (req, res, next) => {
       fullName: tokenData.fullName,
       email: tokenData.email,
       password: tokenData.password,
-      phoneNumber:tokenData.phoneNumber
+      phoneNumber: tokenData.phoneNumber,
     });
 
     await vendor.save();
 
     const token = jwt.sign(
-      { fullname: vendor.fullName, email: vendor.email,id:vendor._id },
+      { fullname: vendor.fullName, email: vendor.email, id: vendor._id },
       secretKey
     );
 
@@ -82,95 +85,121 @@ const verifyOtp = async (req, res, next) => {
   }
 };
 
-const resendOtp = async(req,res,next)=>{
-  const {otpToken} = req.body
-  const data = jwt.decode(otpToken)
-  const { fullName, email, password, phoneNumber } = data
+const resendOtp = async (req, res, next) => {
+  const { otpToken } = req.body;
+  const data = jwt.decode(otpToken);
+  const { fullName, email, password, phoneNumber } = data;
 
-  const vendor = { fullName, email, password, phoneNumber }
+  const vendor = { fullName, email, password, phoneNumber };
 
-  mailOtpGenerator(vendor).then((response)=>{
+  mailOtpGenerator(vendor).then((response) => {
     res.json({
-        token:response
-
-    })
-})
-}
+      token: response,
+    });
+  });
+};
 
 const login = async (req, res, next) => {
   try {
-    const {email,password} = req.body;
-    console.log("data in login", email,password);
+    const { email, password } = req.body;
+    console.log("data in login", email, password);
 
-    let vendor = await VendorModel.findOne({email:email})
-    console.log(vendor)
-    if(!vendor){
-      console.log("invalid email")
-    } 
-    let verified = bcrypt.compareSync(password,vendor.password)
-    if(!verified){
-      console.log("incorrect password")
+    let vendor = await VendorModel.findOne({ email: email });
+    console.log(vendor);
+    if (!vendor) {
+      console.log("invalid email");
+    }
+    let verified = bcrypt.compareSync(password, vendor.password);
+    if (!verified) {
+      console.log("incorrect password");
     }
 
-    const token = jwt.sign({fullName:vendor.fullName,email:vendor.email,id:vendor._id},secretKey)
-     
+    const token = jwt.sign(
+      { fullName: vendor.fullName, email: vendor.email, id: vendor._id },
+      secretKey
+    );
+
     return res.json({
-      _id:vendor._id,
-      success:true,
-      token:token,
-      message:"login successfull"
-    })
-
-
+      _id: vendor._id,
+      success: true,
+      token: token,
+      message: "login successfull",
+    });
   } catch (error) {
     console.log(error);
   }
 };
-   
 
-const vendorData = async(req,res,next)=>{
+const vendorData = async (req, res, next) => {
   try {
-    const id = req.params.id
-    const vendorData = await VendorModel.findById(id).select('-password')
-       
-    res.json(
-      vendorData   
-    ) 
+    const id = req.params.id;
+    const vendorData = await VendorModel.findById(id).select("-password");
 
+    res.json(vendorData);
   } catch (error) {
-    console.log("in cntrlle",error)
+    console.log("in cntrlle", error);
   }
-}
+};
 
-const updateProfile = async(req,res,next)=>{
+const updateProfile = async (req, res, next) => {
   try {
-    const id = req.params.id
-    console.log("in cntrlr",id)
+    const id = req.params.id;
+    console.log("in cntrlr", id);
     const updatedData = req.body;
-    console.log("updated data is ",updatedData)
+    console.log("updated data is ", updatedData);
     console.log("Address Data:", updatedData.address);
 
-    const vendor = await VendorModel.findById(id)
+    const vendor = await VendorModel.findById(id);
 
-    vendor.fullName = updatedData.fullName
-    vendor.centerName = updatedData.centerName
-    vendor.latitude = updatedData.latitude
-    vendor.longitude = updatedData.longitude
+    vendor.fullName = updatedData.fullName;
+    vendor.centerName = updatedData.centerName;
+    vendor.latitude = updatedData.latitude;
+    vendor.longitude = updatedData.longitude;
     vendor.address = updatedData.address;
 
-    await vendor.save()
+    await vendor.save();
 
     res.json({ success: true, message: "Profile updated successfully" });
- 
-
-
   } catch (error) {
-    console.log("error in contrlr",error)
+    console.log("error in contrlr", error);
   }
-}
+};
 
+const categoryData = async (req, res, next) => {
+  try {
+    const category = await CategoryModel.find();
+    res.json(category);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
+const subCategoryData = async (req, res, next) => {
+  try {
+    const subCategory = await SubCategoryModel.find();
+    res.json(subCategory);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
+const vehicleData = async (req, res, next) => {
+  try {
+    const vehicles = await VehicleModel.find();
+    res.json(vehicles);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-export { signUp, verifyOtp, login, vendorData ,updateProfile,resendOtp};
-  
+export {
+  signUp,
+  verifyOtp,
+  login,
+  vendorData,
+  updateProfile,
+  resendOtp,
+  categoryData,
+  subCategoryData,
+  vehicleData
+};
