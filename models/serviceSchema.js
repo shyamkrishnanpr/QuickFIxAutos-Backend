@@ -21,12 +21,9 @@ const serviceSchema = new Schema({
     price:{
         type:Number
     },
-    workList:[{
-        description:String,
-        duration:Number,
-        partsRequired:[String]
-
-    }]
+    description:{
+        type:String
+    }
 })
 
 const serviceModel = mongoose.model("services",serviceSchema)

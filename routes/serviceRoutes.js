@@ -8,7 +8,8 @@ import {
   resendOtp,
   categoryData,
   subCategoryData,
-  vehicleData
+  vehicleData,
+  addService
 } from "../controllers/serviceController.js";
 const serviceRoute = express.Router();
 
@@ -23,5 +24,7 @@ serviceRoute.put("/updateProfile/:id", updateProfile);
 serviceRoute.get("/category", categoryData);
 serviceRoute.get("/subCategory", subCategoryData);
 serviceRoute.get("/vehicles",vehicleData);
+
+serviceRoute.post("/addService",addService)
 
 export default serviceRoute;

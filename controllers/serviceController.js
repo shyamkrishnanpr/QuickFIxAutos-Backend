@@ -2,6 +2,7 @@ import VendorModel from "../models/vendorSchema.js";
 import CategoryModel from "../models/categorySchema.js";
 import SubCategoryModel from "../models/subCategorySchema.js";
 import VehicleModel from "../models/vehicleSchema.js";
+import serviceModel from "../models/serviceSchema.js";
 import bcrypt from "bcrypt";
 import { genSalt } from "bcrypt";
 import { mailOtpGenerator } from "../helpers/nodeMailer/mailOtpGenerator.js";
@@ -176,8 +177,9 @@ const categoryData = async (req, res, next) => {
 
 const subCategoryData = async (req, res, next) => {
   try {
-    const subCategory = await SubCategoryModel.find();
-    res.json(subCategory);
+    const selectedCategory = req.query.categoryId
+    const subcategories = await SubCategoryModel.find({ categoryId: selectedCategory });
+    res.json(subcategories);
   } catch (error) {
     console.log(error);
   }
@@ -192,6 +194,41 @@ const vehicleData = async (req, res, next) => {
   }
 };
 
+const addService = async(req,res,next)=>{
+  try {
+    const {
+      category,
+      subCategory,
+      vehicle,
+      price,
+      description,
+      vendorId,
+    } = req.body;
+
+    console.log("data",req.body)
+
+    const newService = new serviceModel({
+       categoryId:category,
+       subCategoryId:subCategory,
+       vehicleId:vehicle,
+       vendorId:vendorId,
+       price:price,
+       description:description
+
+    })
+
+    const savedService = await newService.save()
+
+    res.json(
+      savedService
+    )
+
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   signUp,
   verifyOtp,
@@ -201,5 +238,6 @@ export {
   resendOtp,
   categoryData,
   subCategoryData,
-  vehicleData
+  vehicleData,
+  addService
 };
