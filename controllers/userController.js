@@ -68,7 +68,7 @@ const verifyOtp = async(req,res,next)=>{
         await user.save()
 
         const token = jwt.sign(
-            { fullname: user.fullName, email: user.email },
+            { fullname: user.fullName, email: user.email,id:user._id },
             secretKey
           );
 

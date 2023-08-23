@@ -1,4 +1,5 @@
 import express from "express";
+import verification from '../middlewares/vendor/vendorAuth.js'
 import {
   signUp,
   verifyOtp,
@@ -9,7 +10,8 @@ import {
   categoryData,
   subCategoryData,
   vehicleData,
-  addService
+  addService,
+  fetchService,
 } from "../controllers/serviceController.js";
 const serviceRoute = express.Router();
 
@@ -18,13 +20,14 @@ serviceRoute.post("/verifyOtp", verifyOtp);
 serviceRoute.post("/login", login);
 serviceRoute.post("/resendOtp", resendOtp);
 
-serviceRoute.get("/vendorInfo/:id", vendorData);
-serviceRoute.put("/updateProfile/:id", updateProfile);
+serviceRoute.get("/vendorInfo/:id",verification.verifyVendor,vendorData);
+serviceRoute.put("/updateProfile/:id",verification.verifyVendor,updateProfile);
 
-serviceRoute.get("/category", categoryData);
-serviceRoute.get("/subCategory", subCategoryData);
-serviceRoute.get("/vehicles",vehicleData);
+serviceRoute.get("/category",verification.verifyVendor,categoryData);
+serviceRoute.get("/subCategory",verification.verifyVendor,subCategoryData);
+serviceRoute.get("/vehicles",verification.verifyVendor,vehicleData);
 
-serviceRoute.post("/addService",addService)
+serviceRoute.post("/addService",verification.verifyVendor,addService);
+serviceRoute.get("/getServices", fetchService);
 
 export default serviceRoute;

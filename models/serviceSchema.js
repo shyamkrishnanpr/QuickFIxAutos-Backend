@@ -23,6 +23,10 @@ const serviceSchema = new Schema({
     },
     description:{
         type:String
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
     }
 })
 

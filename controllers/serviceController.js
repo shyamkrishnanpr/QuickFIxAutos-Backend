@@ -194,6 +194,15 @@ const vehicleData = async (req, res, next) => {
   }
 };
 
+const fetchService = async(req,res,next)=>{
+  try {
+    const services = await serviceModel.find()
+    res.json(services)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const addService = async(req,res,next)=>{
   try {
     const {
@@ -239,5 +248,6 @@ export {
   categoryData,
   subCategoryData,
   vehicleData,
-  addService
+  addService,
+  fetchService
 };
