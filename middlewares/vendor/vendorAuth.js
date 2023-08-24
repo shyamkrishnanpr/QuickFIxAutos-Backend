@@ -13,12 +13,16 @@ const verifyVendor = (req, res, next) => {
   }
 
   try {
-    const tokenJson = JSON.parse(tokenData.split(" ")[1])
-    const token = tokenJson.token
+    const tokenJson = JSON.parse(tokenData.split(" ")[1]);
+    const token = tokenJson.token;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+  
+
     if (decoded) {
+      const vendorId = decoded.id;
+      req.vendorId = vendorId;
       next();
     }
   } catch (error) {

@@ -28,6 +28,6 @@ serviceRoute.get("/subCategory",verification.verifyVendor,subCategoryData);
 serviceRoute.get("/vehicles",verification.verifyVendor,vehicleData);
 
 serviceRoute.post("/addService",verification.verifyVendor,addService);
-serviceRoute.get("/getServices", fetchService);
+serviceRoute.get("/getServices",verification.verifyVendor, fetchService);
 
 export default serviceRoute;

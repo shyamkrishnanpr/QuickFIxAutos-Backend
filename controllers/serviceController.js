@@ -196,7 +196,9 @@ const vehicleData = async (req, res, next) => {
 
 const fetchService = async(req,res,next)=>{
   try {
-    const services = await serviceModel.find()
+    const vendorId = req.vendorId
+
+    const services = await serviceModel.find({_id:vendorId})
     res.json(services)
   } catch (error) {
     console.log(error)
