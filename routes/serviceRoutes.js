@@ -18,7 +18,7 @@ const serviceRoute = express.Router();
 serviceRoute.post("/signUp", signUp);
 serviceRoute.post("/verifyOtp", verifyOtp);
 serviceRoute.post("/login", login);
-serviceRoute.post("/resendOtp", resendOtp);
+serviceRoute.post("/resendOtp", resendOtp);  
 
 serviceRoute.get("/vendorInfo/:id",verification.verifyVendor,vendorData);
 serviceRoute.put("/updateProfile/:id",verification.verifyVendor,updateProfile);
