@@ -4,6 +4,7 @@ import SubCategoryModel from "../models/subCategorySchema.js";
 import VehicleModel from "../models/vehicleSchema.js";
 import UserModel from "../models/userSchema.js";
 import VendorModel from "../models/vendorSchema.js";
+import serviceModel from "../models/serviceSchema.js";
 import { response } from "express";
 import fs from "fs";
 
@@ -232,6 +233,39 @@ const updateVendors = async (req, res, next) => {
   }
 };
 
+const getServices = async(req,res,next)=>{
+  try {
+    const services = await serviceModel.find({isVerified:false})
+    .populate('vendorId')
+    .populate('categoryId')
+    .populate('subCategoryId')
+    .populate('vehicleId')
+    // console.log("at cntrller",services)
+    res.json(
+      services
+    ) 
+
+  } catch (error) {
+    console.log(error)
+}
+}
+
+const verifyService = async(req,res,next)=>{
+  try {
+    const id = req.params.id
+    const response = await serviceModel.findByIdAndUpdate(
+      id,
+      {isVerified:true},
+      {new:true}
+    )
+    res.json(
+      response
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   login,
   Category,
@@ -248,5 +282,7 @@ export {
   fetchUsers,
   updateUsers,
   fetchVendors,
-  updateVendors
+  updateVendors,
+  getServices,
+  verifyService
 };

@@ -208,8 +208,8 @@ const fetchService = async(req,res,next)=>{
     .populate('vehicleId')
     .skip((page-1)*perPage)
     .limit(perPage)
-    
-    console.log("at cntrller service fetched is ",services)
+       
+    // console.log("at cntrller service fetched is ",services)
     res.json(services)
   } catch (error) {
     console.log(error)

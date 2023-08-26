@@ -16,7 +16,9 @@ import {
   fetchUsers,
   updateUsers,
   fetchVendors,
-  updateVendors
+  updateVendors,
+  getServices,
+  verifyService
 } from "../controllers/adminController.js";
 
 const adminRoute = express.Router();
@@ -42,6 +44,9 @@ adminRoute.patch("/users/:id",updateUsers)
 
 adminRoute.get("/vendors",fetchVendors)
 adminRoute.patch("/vendors/:id",updateVendors)
+
+adminRoute.get("/getServices",getServices)
+adminRoute.patch("/verifyService/:id",verifyService)
 
 
 export default adminRoute;     
