@@ -194,7 +194,6 @@ const updateUsers = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { isBlock } = req.body;
-    console.log("id in cntrlr", id);
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       id,
@@ -219,52 +218,47 @@ const fetchVendors = async (req, res, next) => {
 const updateVendors = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const {isBlock} = req.body;
+    const { isBlock } = req.body;
 
     const updateVendor = await VendorModel.findByIdAndUpdate(
-        id,
-        {isBlock},
-        {new:true}
+      id,
+      { isBlock },
+      { new: true }
     );
-        res.json(updateVendor)
-
+    res.json(updateVendor);
   } catch (error) {
     console.log(error);
   }
 };
 
-const getServices = async(req,res,next)=>{
+const getServices = async (req, res, next) => {
   try {
-    const services = await serviceModel.find({isVerified:false})
-    .populate('vendorId')
-    .populate('categoryId')
-    .populate('subCategoryId')
-    .populate('vehicleId')
+    const services = await serviceModel
+      .find({ isVerified: false })
+      .populate("vendorId")
+      .populate("categoryId")
+      .populate("subCategoryId")
+      .populate("vehicleId");
     // console.log("at cntrller",services)
-    res.json(
-      services
-    ) 
-
+    res.json(services);
   } catch (error) {
-    console.log(error)
-}
-}
+    console.log(error);
+  }
+};
 
-const verifyService = async(req,res,next)=>{
+const verifyService = async (req, res, next) => {
   try {
-    const id = req.params.id
+    const id = req.params.id;
     const response = await serviceModel.findByIdAndUpdate(
       id,
-      {isVerified:true},
-      {new:true}
-    )
-    res.json(
-      response
-    )
+      { isVerified: true },
+      { new: true }
+    );
+    res.json(response);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
 export {
   login,
@@ -284,5 +278,5 @@ export {
   fetchVendors,
   updateVendors,
   getServices,
-  verifyService
+  verifyService,
 };
