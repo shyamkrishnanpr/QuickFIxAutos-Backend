@@ -180,7 +180,7 @@ const deleteVehicle = async (req, res, next) => {
     console.log(error);
   }
 };
-
+ 
 const fetchUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find();
@@ -203,7 +203,7 @@ const updateUsers = async (req, res, next) => {
     res.json(updatedUser);
   } catch (error) {
     console.log(error);
-  }
+  }     
 };
 
 const fetchVendors = async (req, res, next) => {

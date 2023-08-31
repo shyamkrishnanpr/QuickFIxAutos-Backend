@@ -115,6 +115,11 @@ const login = async (req, res, next) => {
       console.log("incorrect password");
     }
 
+    if (vendor.isBlock) {
+      console.log("Vendor is blocked");
+      return res.status(403).json({ message: "Vendor is blocked" });
+    }
+
     const token = jwt.sign(
       { fullName: vendor.fullName, email: vendor.email, id: vendor._id },
       secretKey
