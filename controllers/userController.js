@@ -1,6 +1,7 @@
 import UserModel from "../models/userSchema.js";
 import VendorModel from "../models/vendorSchema.js";
 import serviceModel from "../models/serviceSchema.js";
+import CategoryModel from "../models/categorySchema.js";
 import bcrypt from "bcrypt";
 import { mailOtpGenerator } from "../helpers/nodeMailer/mailOtpGenerator.js";
 import { compareOtp } from "../helpers/nodeMailer/compareOtp.js";
@@ -173,4 +174,16 @@ const fetchServices = async (req, res, next) => {
   }
 };
 
-export { signUp, verifyOtp, resendOtp, login, fetchServices };
+const categoryData = async (req, res, next) => {
+  try {
+    const category = await CategoryModel.find();
+    // console.log(category,"cnt")
+    res.json(category);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+
+export { signUp, verifyOtp, resendOtp, login, fetchServices,categoryData };
