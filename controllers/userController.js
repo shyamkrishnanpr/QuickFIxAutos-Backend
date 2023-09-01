@@ -1,6 +1,7 @@
 import UserModel from "../models/userSchema.js";
 import VendorModel from "../models/vendorSchema.js";
 import serviceModel from "../models/serviceSchema.js";
+import VehicleModal from "../models/vehicleSchema.js";
 import CategoryModel from "../models/categorySchema.js";
 import bcrypt from "bcrypt";
 import { mailOtpGenerator } from "../helpers/nodeMailer/mailOtpGenerator.js";
@@ -148,23 +149,23 @@ const fetchServices = async (req, res, next) => {
 
     const vendors = await VendorModel.find();
 
-    const nearByVendors= vendors.filter((vendor) => {
+    const nearByVendors = vendors.filter((vendor) => {
       const vendorLocation = {
         latitude: vendor.latitude,
         longitude: vendor.longitude,
-      };   
+      };
 
       const distance = geolib.getDistance(userLocation, vendorLocation);
       return distance <= maxDistance;
     });
     const services = [];
 
-    
     for (const vendor of nearByVendors) {
-      const vendorServices = await serviceModel.find({ vendorId: vendor._id ,isVerified:true})
-      .populate('vendorId')
-      .populate('categoryId')
-      .populate('subCategoryId')
+      const vendorServices = await serviceModel
+        .find({ vendorId: vendor._id, isVerified: true })
+        .populate("vendorId")
+        .populate("categoryId")
+        .populate("subCategoryId");
       services.push(...vendorServices);
     }
 
@@ -184,6 +185,21 @@ const categoryData = async (req, res, next) => {
   }
 };
 
+const vehicleData = async (req, res, next) => {
+  try {
+    const vehicles = await VehicleModal.find();
+    res.json(vehicles);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-
-export { signUp, verifyOtp, resendOtp, login, fetchServices,categoryData };
+export {
+  signUp,
+  verifyOtp,
+  resendOtp,
+  login,
+  fetchServices,
+  categoryData,
+  vehicleData,
+};
