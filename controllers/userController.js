@@ -49,7 +49,7 @@ const signUp = async (req, res, next) => {
 const verifyOtp = async (req, res, next) => {
   try {
     const otpData = req.body;
-    console.log("at controller ", otpData);
+
     const { otp, otpToken } = otpData;
 
     const otpVerified = compareOtp(otpData);
@@ -113,11 +113,17 @@ const login = async (req, res, next) => {
 
     let user = await UserModel.findOne({ email: email });
     if (!user) {
-      console.log("invalid email");
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
     }
     let verified = bcrypt.compareSync(password, user.password);
     if (!verified) {
-      console.log("incorrect password");
+      return res.status(404).json({
+        success: false,
+        message: "incorrect password",
+      });
     }
 
     if (user.isBlock) {
@@ -136,6 +142,60 @@ const login = async (req, res, next) => {
       token: token,
       message: "login successfull",
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.isBlock) {
+      return res.status(404).json({
+        success: false,
+        message: "User is blocked",
+      });
+    }
+    mailOtpGenerator(user).then((response) => {
+      res.json({
+        success: true,
+        token: response,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const verifyOtpForget = async (req, res, next) => {
+  try {
+    const otpData = req.body;
+
+    const { otp, otpToken } = otpData;
+    const otpVerified = compareOtp(otpData);
+    if (!otpVerified)
+      return res.status(400).json({
+        success: false,
+        message: "otp verification failed",
+      });
+        
+      
+      return res.json({
+        success: true,
+        message: "OTP verified successfully.",
+      });
+
+    
+    console.log(req.body);
   } catch (error) {
     console.log(error);
   }
@@ -202,4 +262,6 @@ export {
   fetchServices,
   categoryData,
   vehicleData,
+  forgotPassword,
+  verifyOtpForget,
 };
