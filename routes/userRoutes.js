@@ -10,7 +10,8 @@ import {
   categoryData,
   vehicleData,
   forgotPassword,
-  verifyOtpForget
+  verifyOtpForget,
+  resetPassword
 } from "../controllers/userController.js";
 
 userRoutes.post("/signUp", signUp);
@@ -19,6 +20,7 @@ userRoutes.post("/resendOtp", resendOtp);
 userRoutes.post("/login", login);
 userRoutes.post("/forgotPassword",forgotPassword)
 userRoutes.post("/verifyOtpForget",verifyOtpForget)
+userRoutes.post("/resetPassword",resetPassword)
 
 userRoutes.post("/services", fetchServices);
 userRoutes.get("/categories", categoryData);

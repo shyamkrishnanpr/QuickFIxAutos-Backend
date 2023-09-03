@@ -17,11 +17,11 @@ function expirationTime(date, minutes) {
 
 export const mailOtpGenerator = async (data) => {
   try {
-    console.log("data in mail", data);
+    // console.log("data in mail", data);
     const email = data.email;
 
     const otp = generateOtp(6);
-    console.log(otp);
+    // console.log(otp);
 
     const now = new Date();
     const expireTime = expirationTime(now, 1);
@@ -29,10 +29,10 @@ export const mailOtpGenerator = async (data) => {
 
     const salt = await bcrypt.genSalt(10);
     const otpEncrypt = await bcrypt.hash(otp.toString(), salt);
-    console.log(otpEncrypt);
+    // console.log(otpEncrypt);
 
     data = { ...data, otpEncrypt, expireTime };
-    console.log(data)
+    // console.log(data)
 
     const otpSecretKey = process.env.JWT_SECRET;
     const otpToken = jwt.sign({
@@ -44,7 +44,7 @@ export const mailOtpGenerator = async (data) => {
       expirationTime:data.expireTime
     },otpSecretKey);
 
-   console.log(otpToken)
+  //  console.log(otpToken)
 
 
    const transporter = nodemailer.createTransport({
@@ -73,7 +73,7 @@ export const mailOtpGenerator = async (data) => {
             console.log("error in send mail",err)
             reject(err)
         } else {
-            console.log("Mail send succesfully",info)
+            // console.log("Mail send succesfully",info)
             resolve(otpToken)
         }
     }) 

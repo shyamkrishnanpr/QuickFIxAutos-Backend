@@ -187,17 +187,43 @@ const verifyOtpForget = async (req, res, next) => {
         success: false,
         message: "otp verification failed",
       });
-        
-      
-      return res.json({
-        success: true,
-        message: "OTP verified successfully.",
-      });
 
-    
-    console.log(req.body);
+    return res.json({
+      success: true,
+      message: "OTP verified successfully.",
+    });
   } catch (error) {
     console.log(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while resetting the password",
+    });
   }
 };
 
@@ -264,4 +290,5 @@ export {
   vehicleData,
   forgotPassword,
   verifyOtpForget,
+  resetPassword,
 };
