@@ -108,11 +108,17 @@ const login = async (req, res, next) => {
     let vendor = await VendorModel.findOne({ email: email });
     console.log(vendor);
     if (!vendor) {
-      console.log("invalid email");
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found.",
+      });
     }
     let verified = bcrypt.compareSync(password, vendor.password);
     if (!verified) {
-      console.log("incorrect password");
+      return res.status(404).json({
+        success: false,
+        message: "incorrect password",
+      });
     }
 
     if (vendor.isBlock) {

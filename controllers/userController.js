@@ -132,7 +132,7 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { fullName: user.fullName, email: user.email },
+      { fullName: user.fullName, email: user.email,id:user._id },
       secretKey
     );
 
@@ -230,6 +230,8 @@ const resetPassword = async (req, res, next) => {
 const fetchServices = async (req, res, next) => {
   try {
     const { userLocation } = req.body;
+    const vehicleId = userLocation.vehicleId;
+    console.log("vehicleid is ",vehicleId)
     console.log(req.body, "cntrller");
     const maxDistance = 10 * 5000;
 
@@ -248,18 +250,38 @@ const fetchServices = async (req, res, next) => {
 
     for (const vendor of nearByVendors) {
       const vendorServices = await serviceModel
-        .find({ vendorId: vendor._id, isVerified: true })
+        .find({ vendorId: vendor._id , isVerified: true,vehicleId: vehicleId })
         .populate("vendorId")
         .populate("categoryId")
-        .populate("subCategoryId");
+        .populate("subCategoryId")
+        .populate("vehicleId");
       services.push(...vendorServices);
     }
+
+    // console.log(services)
 
     res.json(services);
   } catch (error) {
     console.log(error);
   }
 };
+
+const serviceDetailFetch = async(req,res,next)=>{
+  try {
+    const {serviceId} = req.params;
+    
+
+    const serviceDetails = await serviceModel.find({_id:serviceId})
+    .populate("vendorId")
+    .populate("categoryId")
+    .populate("subCategoryId")
+    .populate("vehicleId")
+   
+    res.json(serviceDetails)
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 const categoryData = async (req, res, next) => {
   try {
@@ -291,4 +313,5 @@ export {
   forgotPassword,
   verifyOtpForget,
   resetPassword,
+  serviceDetailFetch
 };

@@ -11,7 +11,8 @@ import {
   vehicleData,
   forgotPassword,
   verifyOtpForget,
-  resetPassword
+  resetPassword,
+  serviceDetailFetch
 } from "../controllers/userController.js";
 
 userRoutes.post("/signUp", signUp);
@@ -23,6 +24,7 @@ userRoutes.post("/verifyOtpForget",verifyOtpForget)
 userRoutes.post("/resetPassword",resetPassword)
 
 userRoutes.post("/services", fetchServices);
+userRoutes.get("/serviceDetails/:serviceId",serviceDetailFetch)
 userRoutes.get("/categories", categoryData);
 
 userRoutes.get("/vehicles", vehicleData);
