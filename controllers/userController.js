@@ -258,7 +258,7 @@ const fetchServices = async (req, res, next) => {
       services.push(...vendorServices);
     }
 
-    // console.log(services)
+   
 
     res.json(services);
   } catch (error) {
@@ -280,6 +280,7 @@ const serviceDetailFetch = async(req,res,next)=>{
     res.json(serviceDetails)
   } catch (error) {
     console.log(error)
+    res.status(500).json({ error: 'An internal server error occurred' });
   }
 }
 

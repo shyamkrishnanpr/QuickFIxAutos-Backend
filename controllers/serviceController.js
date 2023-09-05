@@ -123,8 +123,11 @@ const login = async (req, res, next) => {
 
     if (vendor.isBlock) {
       console.log("Vendor is blocked");
-      return res.status(403).json({ message: "Vendor is blocked" });
+      return res.status(403).json({
+        success:false,
+         message: "Vendor is blocked" });
     }
+    
 
     const token = jwt.sign(
       { fullName: vendor.fullName, email: vendor.email, id: vendor._id },
@@ -135,22 +138,22 @@ const login = async (req, res, next) => {
       _id: vendor._id,
       success: true,
       token: token,
-      message: "login successfull",
+      message: "Login successfull",
     });
   } catch (error) {
     console.log(error);
   }
 };
-
+ 
 const vendorData = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const vendorData = await VendorModel.findById(id).select("-password");
+    const id = req.vendorId
+    const vendorData = await VendorModel.findById({_id:id}).select("-password");
 
     res.json(vendorData);
   } catch (error) {
     console.log("in cntrlle", error);
-  }
+  } 
 };
 
 const updateProfile = async (req, res, next) => {

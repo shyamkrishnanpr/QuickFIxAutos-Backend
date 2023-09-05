@@ -20,7 +20,7 @@ serviceRoute.post("/verifyOtp", verifyOtp);
 serviceRoute.post("/login", login);
 serviceRoute.post("/resendOtp", resendOtp);  
 
-serviceRoute.get("/vendorInfo/:id",verification.verifyVendor,vendorData);
+serviceRoute.get("/vendorInfo",verification.verifyVendor,vendorData);
 serviceRoute.put("/updateProfile/:id",verification.verifyVendor,updateProfile);
 
 serviceRoute.get("/category",verification.verifyVendor,categoryData);
