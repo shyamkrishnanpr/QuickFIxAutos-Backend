@@ -49,9 +49,7 @@ const signUp = async (req, res, next) => {
 const verifyOtp = async (req, res, next) => {
   try {
     const otpData = req.body;
-
     const { otp, otpToken } = otpData;
-
     const otpVerified = compareOtp(otpData);
     if (!otpVerified)
       return res.status(400).json({
@@ -115,7 +113,7 @@ const login = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found.",
+        message: "Enter a valid email address.....",
       });
     }
     let verified = bcrypt.compareSync(password, user.password);
@@ -132,7 +130,7 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { fullName: user.fullName, email: user.email,id:user._id },
+      { fullName: user.fullName, email: user.email, id: user._id },
       secretKey
     );
 
@@ -155,7 +153,7 @@ const forgotPassword = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Invalid email address...",
       });
     }
 
@@ -185,7 +183,7 @@ const verifyOtpForget = async (req, res, next) => {
     if (!otpVerified)
       return res.status(400).json({
         success: false,
-        message: "otp verification failed",
+        message: "Enter a valid otp....",
       });
 
     return res.json({
@@ -231,7 +229,7 @@ const fetchServices = async (req, res, next) => {
   try {
     const { userLocation } = req.body;
     const vehicleId = userLocation.vehicleId;
-    console.log("vehicleid is ",vehicleId)
+    console.log("vehicleid is ", vehicleId);
     console.log(req.body, "cntrller");
     const maxDistance = 10 * 5000;
 
@@ -250,7 +248,7 @@ const fetchServices = async (req, res, next) => {
 
     for (const vendor of nearByVendors) {
       const vendorServices = await serviceModel
-        .find({ vendorId: vendor._id , isVerified: true,vehicleId: vehicleId })
+        .find({ vendorId: vendor._id, isVerified: true, vehicleId: vehicleId })
         .populate("vendorId")
         .populate("categoryId")
         .populate("subCategoryId")
@@ -258,31 +256,29 @@ const fetchServices = async (req, res, next) => {
       services.push(...vendorServices);
     }
 
-   
-
     res.json(services);
   } catch (error) {
     console.log(error);
   }
 };
 
-const serviceDetailFetch = async(req,res,next)=>{
+const serviceDetailFetch = async (req, res, next) => {
   try {
-    const {serviceId} = req.params;
-    
+    const { serviceId } = req.params;
 
-    const serviceDetails = await serviceModel.find({_id:serviceId})
-    .populate("vendorId")
-    .populate("categoryId")
-    .populate("subCategoryId")
-    .populate("vehicleId")
-   
-    res.json(serviceDetails)
+    const serviceDetails = await serviceModel
+      .find({ _id: serviceId })
+      .populate("vendorId")
+      .populate("categoryId")
+      .populate("subCategoryId")
+      .populate("vehicleId");
+
+    res.json(serviceDetails);
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'An internal server error occurred' });
+    console.log(error);
+    res.status(500).json({ error: "An internal server error occurred" });
   }
-}
+};
 
 const categoryData = async (req, res, next) => {
   try {
@@ -314,5 +310,5 @@ export {
   forgotPassword,
   verifyOtpForget,
   resetPassword,
-  serviceDetailFetch
+  serviceDetailFetch,
 };

@@ -20,7 +20,6 @@ const signUp = async (req, res, next) => {
       $or: [{ email: req.body.email }, { phoneNumber: req.body.phoneNumber }],
     });
     if (vendor) {
-      console.log("vendor exists");
       return res.status(400).json({
         success: false,
         message: "vendor already exists",
@@ -106,7 +105,7 @@ const login = async (req, res, next) => {
     console.log("data in login", email, password);
 
     let vendor = await VendorModel.findOne({ email: email });
-    console.log(vendor);
+
     if (!vendor) {
       return res.status(404).json({
         success: false,
@@ -124,10 +123,10 @@ const login = async (req, res, next) => {
     if (vendor.isBlock) {
       console.log("Vendor is blocked");
       return res.status(403).json({
-        success:false,
-         message: "Vendor is blocked" });
+        success: false,
+        message: "Vendor is blocked",
+      });
     }
-    
 
     const token = jwt.sign(
       { fullName: vendor.fullName, email: vendor.email, id: vendor._id },
@@ -144,16 +143,18 @@ const login = async (req, res, next) => {
     console.log(error);
   }
 };
- 
+
 const vendorData = async (req, res, next) => {
   try {
-    const id = req.vendorId
-    const vendorData = await VendorModel.findById({_id:id}).select("-password");
+    const id = req.vendorId;
+    const vendorData = await VendorModel.findById({ _id: id }).select(
+      "-password"
+    );
 
     res.json(vendorData);
   } catch (error) {
     console.log("in cntrlle", error);
-  } 
+  }
 };
 
 const updateProfile = async (req, res, next) => {
@@ -191,8 +192,10 @@ const categoryData = async (req, res, next) => {
 
 const subCategoryData = async (req, res, next) => {
   try {
-    const selectedCategory = req.query.categoryId
-    const subcategories = await SubCategoryModel.find({ categoryId: selectedCategory });
+    const selectedCategory = req.query.categoryId;
+    const subcategories = await SubCategoryModel.find({
+      categoryId: selectedCategory,
+    });
     res.json(subcategories);
   } catch (error) {
     console.log(error);
@@ -208,29 +211,29 @@ const vehicleData = async (req, res, next) => {
   }
 };
 
-const fetchService = async(req,res,next)=>{
+const fetchService = async (req, res, next) => {
   try {
+    const vendorId = req.vendorId;
+    const page = req.query.page || 1;
+    console.log("page", page);
+    const perPage = req.query.perPage || 2;
 
-    const vendorId = req.vendorId
-    const page = req.query.page||1
-    console.log("page",page)
-    const perPage = req.query.perPage||2
+    const services = await serviceModel
+      .find({ vendorId: vendorId })
+      .populate("categoryId")
+      .populate("subCategoryId")
+      .populate("vehicleId")
+      .skip((page - 1) * perPage)
+      .limit(perPage);
 
-    const services = await serviceModel.find({vendorId:vendorId})
-    .populate('categoryId')
-    .populate('subCategoryId')
-    .populate('vehicleId')
-    .skip((page-1)*perPage)
-    .limit(perPage)
-       
     // console.log("at cntrller service fetched is ",services)
-    res.json(services)
+    res.json(services);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const addService = async(req,res,next)=>{
+const addService = async (req, res, next) => {
   try {
     const {
       category,
@@ -242,35 +245,31 @@ const addService = async(req,res,next)=>{
       vendorId,
     } = req.body;
 
-    console.log("data",req.body)
+    console.log("data", req.body);
 
     const newService = new serviceModel({
-       categoryId:category,
-       subCategoryId:subCategory,
-       vehicleId:vehicle,
-       vendorId:vendorId,
-       price:price,
-       fuelOption:fuelOption,
-       description:description
+      categoryId: category,
+      subCategoryId: subCategory,
+      vehicleId: vehicle,
+      vendorId: vendorId,
+      price: price,
+      fuelOption: fuelOption,
+      description: description,
+    });
 
-    })
+    const savedService = await newService.save();
+    const populatedService = await serviceModel
+      .findById(savedService._id)
+      .populate("categoryId")
+      .populate("subCategoryId")
+      .populate("vehicleId")
+      .exec();
 
-    const savedService = await newService.save()
-    const populatedService = await serviceModel.findById(savedService._id)
-    .populate('categoryId')
-    .populate('subCategoryId')
-    .populate('vehicleId')
-    .exec();
-
-    res.json(
-      populatedService
-    )
-
-
+    res.json(populatedService);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
 export {
   signUp,
@@ -283,5 +282,5 @@ export {
   subCategoryData,
   vehicleData,
   addService,
-  fetchService
+  fetchService,
 };
