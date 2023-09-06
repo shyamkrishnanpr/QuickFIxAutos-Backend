@@ -22,7 +22,7 @@ userRoutes.post("/login", login);
 userRoutes.post("/forgotPassword",forgotPassword)
 userRoutes.post("/verifyOtpForget",verifyOtpForget)
 userRoutes.post("/resetPassword",resetPassword)
-
+ 
 userRoutes.post("/services", fetchServices);
 userRoutes.get("/serviceDetails/:serviceId",serviceDetailFetch)
 userRoutes.get("/categories", categoryData);
