@@ -19,7 +19,8 @@ import {
   fetchVendors,
   updateVendors,
   getServices,
-  verifyService
+  verifyService,
+  getAllService
 } from "../controllers/adminController.js";
 
 const adminRoute = express.Router();
@@ -48,6 +49,7 @@ adminRoute.patch("/vendors/:id",verification.verifyAdmin,updateVendors)
 
 adminRoute.get("/getServices",verification.verifyAdmin,getServices)
 adminRoute.patch("/verifyService/:id",verification.verifyAdmin,verifyService)
+adminRoute.get("/getAllService",getAllService)
 
 
 export default adminRoute;     

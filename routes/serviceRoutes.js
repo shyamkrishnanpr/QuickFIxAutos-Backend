@@ -29,5 +29,5 @@ serviceRoute.get("/vehicles",verification.verifyVendor,vehicleData);
 
 serviceRoute.post("/addService",verification.verifyVendor,addService);
 serviceRoute.get("/getServices",verification.verifyVendor, fetchService);
-
+ 
 export default serviceRoute;

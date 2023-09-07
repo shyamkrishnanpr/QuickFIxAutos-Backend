@@ -180,7 +180,7 @@ const deleteVehicle = async (req, res, next) => {
     console.log(error);
   }
 };
- 
+
 const fetchUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find();
@@ -203,7 +203,7 @@ const updateUsers = async (req, res, next) => {
     res.json(updatedUser);
   } catch (error) {
     console.log(error);
-  }     
+  }
 };
 
 const fetchVendors = async (req, res, next) => {
@@ -233,14 +233,20 @@ const updateVendors = async (req, res, next) => {
 
 const getServices = async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 3;
+    const skip = (page - 1) * pageSize;
+    const count = await serviceModel.find({isVerified:false}).count();
     const services = await serviceModel
       .find({ isVerified: false })
+      .skip(skip)
+      .limit(pageSize)
       .populate("vendorId")
       .populate("categoryId")
       .populate("subCategoryId")
       .populate("vehicleId");
     // console.log("at cntrller",services)
-    res.json(services);
+    res.json({services,count});
   } catch (error) {
     console.log(error);
   }
@@ -255,6 +261,28 @@ const verifyService = async (req, res, next) => {
       { new: true }
     );
     res.json(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getAllService = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 3;
+    const skip = (page - 1) * pageSize;
+    const count = await serviceModel.find().count();
+
+    const services = await serviceModel
+      .find()
+      .skip(skip)
+      .limit(pageSize)
+      .populate("categoryId")
+      .populate("subCategoryId")
+      .populate("vehicleId")
+      .populate("vendorId");
+
+    res.json({ services, count });
   } catch (error) {
     console.log(error);
   }
@@ -279,4 +307,5 @@ export {
   updateVendors,
   getServices,
   verifyService,
+  getAllService,
 };
