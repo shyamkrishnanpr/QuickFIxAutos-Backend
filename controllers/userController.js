@@ -229,8 +229,8 @@ const fetchServices = async (req, res, next) => {
   try {
     const { userLocation } = req.body;
     const vehicleId = userLocation.vehicleId;
-    console.log("vehicleid is ", vehicleId);
-    console.log(req.body, "cntrller");
+    // console.log("vehicleid is ", vehicleId);
+    // console.log(req.body, "cntrller");
     const maxDistance = 10 * 5000;
 
     const vendors = await VendorModel.find();
@@ -272,7 +272,7 @@ const serviceDetailFetch = async (req, res, next) => {
       .populate("categoryId")
       .populate("subCategoryId")
       .populate("vehicleId");
-
+ 
     res.json(serviceDetails);
   } catch (error) {
     console.log(error);
