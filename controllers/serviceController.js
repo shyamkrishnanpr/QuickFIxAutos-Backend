@@ -233,6 +233,10 @@ const fetchService = async (req, res, next) => {
   }
 };
 
+
+
+
+
 const addService = async (req, res, next) => {
   try {
     const {
@@ -271,6 +275,42 @@ const addService = async (req, res, next) => {
   }
 };
 
+const addSlots = async(req,res,next)=>{
+  const vendorId = req.vendorId
+  const slotWithDates = req.body
+
+  console.log(req.body,"data at addslot")
+  try {
+    const vendor = await VendorModel.findById(vendorId)
+    // console.log(vendor,"at cntrller vendor")
+
+
+    if (!vendor) {
+      return res.status(404).json({ error: 'Vendor not found' });
+    }
+
+    Object.keys(slotWithDates).forEach((date)=>{
+      const slots = slotWithDates[date]
+      console.log(slots,"slots at cntrller")
+      const existingAvailability = vendor.availability.find((availability)=>availability.date===date)
+   
+    
+
+
+     
+      if(existingAvailability){
+        existingAvailability.slots.push(...slots,slots)
+      }else{
+        vendor.availability.push({date,slot:slots})
+      }
+    })
+   await vendor.save()
+   res.status(200).json({ message: 'Slots added successfully' });
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   signUp,
   verifyOtp,
@@ -283,4 +323,5 @@ export {
   vehicleData,
   addService,
   fetchService,
+  addSlots
 };

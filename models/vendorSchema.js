@@ -48,6 +48,12 @@ const vendorSchema = new Schema({
             }
 
         }
+    ],
+    availability:[
+        {
+            date:String,
+            slots:[]
+        }
     ]
 
 

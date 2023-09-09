@@ -12,6 +12,7 @@ import {
   vehicleData,
   addService, 
   fetchService,
+  addSlots
 } from "../controllers/serviceController.js";
 const serviceRoute = express.Router();
  
@@ -29,5 +30,7 @@ serviceRoute.get("/vehicles",verification.verifyVendor,vehicleData);
 
 serviceRoute.post("/addService",verification.verifyVendor,addService);
 serviceRoute.get("/getServices",verification.verifyVendor, fetchService);
+
+serviceRoute.post("/addSlots",verification.verifyVendor,addSlots)
  
 export default serviceRoute;
