@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import CategoryModel from "../models/categorySchema.js";
 import SubCategoryModel from "../models/subCategorySchema.js";
 import VehicleModel from "../models/vehicleSchema.js";
+import BannerModel from "../models/bannerSchema.js";
 import UserModel from "../models/userSchema.js";
 import VendorModel from "../models/vendorSchema.js";
 import serviceModel from "../models/serviceSchema.js";
@@ -288,6 +289,34 @@ const getAllService = async (req, res, next) => {
   }
 };
 
+const addBanner = async(req,res,next)=>{
+  try {
+    const banner = req.body
+    banner.bannerImage = req.file.filename
+
+    console.log(banner.bannerImage,"buuuu")
+    
+     await BannerModel.create(banner)
+     res.json(banner)
+
+
+    console.log(banner,"add banner cntroller")
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const banners = async(req,res,next)=>{
+  try {
+    const banners = await BannerModel.find()
+    res.json(banners)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
 export {
   login,
   Category,
@@ -308,4 +337,6 @@ export {
   getServices,
   verifyService,
   getAllService,
+  addBanner,
+  banners
 };
