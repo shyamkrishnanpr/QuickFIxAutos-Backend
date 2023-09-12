@@ -3,12 +3,15 @@ import VendorModel from "../models/vendorSchema.js";
 import serviceModel from "../models/serviceSchema.js";
 import VehicleModal from "../models/vehicleSchema.js";
 import CategoryModel from "../models/categorySchema.js";
+import BannerModel from "../models/bannerSchema.js";
+import BookingModel from "../models/bookingSchema.js";
 import bcrypt from "bcrypt";
 import { mailOtpGenerator } from "../helpers/nodeMailer/mailOtpGenerator.js";
 import { compareOtp } from "../helpers/nodeMailer/compareOtp.js";
 import jwt from "jsonwebtoken";
 import { response } from "express";
 import geolib from "geolib";
+
 
 const secretKey = process.env.JWT_SECRET;
 
@@ -299,6 +302,40 @@ const vehicleData = async (req, res, next) => {
   }
 };
 
+
+const banners = async(req,res,next)=>{
+  try {
+    const banners = await BannerModel.find()
+    console.log(banners,"atb")
+    res.json(banners)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+const booking = async(req,res,next)=>{
+  try {
+    const { serviceId, selectedDate, selectedTimeSlot, selectedAddress, paymentMethod } = req.body;
+    console.log(req.body,"atcntrl")
+
+    const booking = new BookingModel({
+      serviceId,
+      selectedDate,
+      selectedTimeSlot,
+      selectedAddress,
+      paymentMethod
+    })
+
+    await booking.save()
+
+    res.status(201).json({ message: 'Booking successfully saved.' });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'An error occurred while saving the booking.' });
+  }
+}
+
 export {
   signUp,
   verifyOtp,
@@ -311,4 +348,6 @@ export {
   verifyOtpForget,
   resetPassword,
   serviceDetailFetch,
+  banners,
+  booking
 };

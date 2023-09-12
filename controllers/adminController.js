@@ -309,6 +309,7 @@ const addBanner = async(req,res,next)=>{
 const banners = async(req,res,next)=>{
   try {
     const banners = await BannerModel.find()
+    console.log(banners,"atb")
     res.json(banners)
   } catch (error) {
     console.log(error)
