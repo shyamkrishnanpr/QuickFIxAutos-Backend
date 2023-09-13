@@ -14,7 +14,9 @@ import {
   resetPassword,
   serviceDetailFetch,
   banners,
-  booking
+  booking,
+  payment,
+  confirmOrder
 } from "../controllers/userController.js";
 
 userRoutes.post("/signUp", signUp);
@@ -33,6 +35,9 @@ userRoutes.get("/vehicles", vehicleData);
 userRoutes.get("/getBanner",banners)
 
 userRoutes.post("/booking",booking)
+
+userRoutes.post("/orders",payment)
+userRoutes.post("/order",confirmOrder)
 
 
 export default userRoutes;

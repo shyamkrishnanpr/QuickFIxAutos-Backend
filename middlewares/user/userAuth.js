@@ -15,7 +15,7 @@ const verifyUser = async (req, res, next) => {
     const token = tokenJson.token;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+ 
     if (decoded) {
       const userId = decoded.id;
       const user = await UserModel.findById({ _id: userId });

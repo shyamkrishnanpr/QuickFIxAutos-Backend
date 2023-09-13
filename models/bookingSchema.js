@@ -7,6 +7,10 @@ const bookingSchema = new Schema({
         type:mongoose.Types.ObjectId,
         ref:"services"
     },
+    userId:{
+        type:mongoose.Types.ObjectId,
+        ref:"user"
+    },
     selectedDate:{
         type:Date
     },

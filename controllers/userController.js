@@ -11,6 +11,7 @@ import { compareOtp } from "../helpers/nodeMailer/compareOtp.js";
 import jwt from "jsonwebtoken";
 import { response } from "express";
 import geolib from "geolib";
+import Razorpay from 'razorpay'
 
 
 const secretKey = process.env.JWT_SECRET;
@@ -336,6 +337,80 @@ const booking = async(req,res,next)=>{
   }
 }
 
+const payment = async(req,res,next)=>{
+  try {
+    const {order_id,amount,payment_capture} = req.body
+    const razorpayInstance = new Razorpay({
+      key_id:process.env.KEY_ID,
+      key_secret:process.env.KEY_SECRET
+    })
+
+    const option = {
+      receipt: order_id,
+      amount: amount*100 ,
+      currency: "INR",
+      payment_capture: payment_capture,
+    };
+    const order = await razorpayInstance.orders.create(option);
+
+    if (!order) {
+      throw new Error("Failed to create order");
+    }
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const confirmOrder = async(req,res,next)=>{
+  try {
+     const userId = req.userId
+
+     console.log(userId,"at cntdd")
+
+    const razorpayInstance = new Razorpay({
+      key_id: process.env.KEY_ID,
+      key_secret: process.env.KEY_SECRET,
+    });
+    const { orderId, packageDatas } = req.body;
+    const {serviceId,selectedDate,selectedTimeSlot,selectedAddress} = packageDatas
+    console.log(packageDatas,"ctrl")
+    const order = await razorpayInstance.orders.fetch(orderId);
+    
+    if (!order) return res.status(500).send("somthing error");
+
+
+    if (order.status === "paid") {
+      console.log("payment successs");
+
+      const newOrder = new BookingModel({
+      
+        serviceId,
+        selectedDate,
+        selectedTimeSlot,
+        selectedAddress,
+        paymentMethod:"paid"
+      });
+      newOrder
+        .save()
+        .then((data) => {
+          res.status(200).json({ success: true, data: data });
+        })
+        .catch(() => {
+          res.json({
+            status: false,
+            message: "order not placed",
+          });
+        });
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
 export {
   signUp,
   verifyOtp,
@@ -349,5 +424,7 @@ export {
   resetPassword,
   serviceDetailFetch,
   banners,
-  booking
+  booking,
+  payment,
+  confirmOrder
 };

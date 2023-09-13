@@ -27,6 +27,7 @@ const verifyVendor = async(req, res, next) => {
       if(vendor.isBlock){
         return res.status(403).json({ message: "Vendors is blocked" });
       }
+      
     
       next();
     }
