@@ -317,15 +317,20 @@ const banners = async(req,res,next)=>{
 
 const booking = async(req,res,next)=>{
   try {
+    const userId = req.userId
+
+    console.log(userId,"at booking")
     const { serviceId, selectedDate, selectedTimeSlot, selectedAddress, paymentMethod } = req.body;
     console.log(req.body,"atcntrl")
 
     const booking = new BookingModel({
       serviceId,
+      userId:userId,
       selectedDate,
       selectedTimeSlot,
       selectedAddress,
-      paymentMethod
+      paymentMethod,
+      paymentStatus:"Pending"
     })
 
     await booking.save()
@@ -387,10 +392,12 @@ const confirmOrder = async(req,res,next)=>{
       const newOrder = new BookingModel({
       
         serviceId,
+        userId:userId,
         selectedDate,
         selectedTimeSlot,
         selectedAddress,
-        paymentMethod:"paid"
+        paymentMethod:"Online",
+        paymentStatus:"Paid"
       });
       newOrder
         .save()

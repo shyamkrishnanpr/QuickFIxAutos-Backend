@@ -22,6 +22,9 @@ const bookingSchema = new Schema({
     },
     paymentMethod:{
         type:String
+    },
+    paymentStatus:{
+        type:String
     }
 
 })

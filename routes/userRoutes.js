@@ -34,10 +34,10 @@ userRoutes.get("/categories", categoryData);
 userRoutes.get("/vehicles", vehicleData);
 userRoutes.get("/getBanner",banners)
 
-userRoutes.post("/booking",booking)
+userRoutes.post("/booking",verification.verifyUser,booking)
 
-userRoutes.post("/orders",payment)
-userRoutes.post("/order",confirmOrder)
+userRoutes.post("/orders",verification.verifyUser,payment)
+userRoutes.post("/order",verification.verifyUser,confirmOrder)
 
 
 export default userRoutes;

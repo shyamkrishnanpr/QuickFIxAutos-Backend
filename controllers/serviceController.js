@@ -238,6 +238,7 @@ const fetchService = async (req, res, next) => {
 
 
 const addService = async (req, res, next) => {
+
   try {
     const {
       category,
@@ -277,6 +278,7 @@ const addService = async (req, res, next) => {
 
 const addSlots = async(req,res,next)=>{
   const vendorId = req.vendorId
+  console.log(vendorId,"at add slot")
   const slotWithDates = req.body
 
   console.log(req.body,"data at addslot")

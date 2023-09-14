@@ -18,6 +18,8 @@ const verifyUser = async (req, res, next) => {
  
     if (decoded) {
       const userId = decoded.id;
+      req.userId = userId
+      
       const user = await UserModel.findById({ _id: userId });
       if (user.isBlock) {
         return res.status(403).json({ message: "User is blocked" });
