@@ -320,11 +320,12 @@ const booking = async(req,res,next)=>{
     const userId = req.userId
 
     console.log(userId,"at booking")
-    const { serviceId, selectedDate, selectedTimeSlot, selectedAddress, paymentMethod } = req.body;
+    const { serviceId,vendorId, selectedDate, selectedTimeSlot, selectedAddress, paymentMethod } = req.body;
     console.log(req.body,"atcntrl")
 
     const booking = new BookingModel({
       serviceId,
+      vendorId,
       userId:userId,
       selectedDate,
       selectedTimeSlot,
@@ -379,7 +380,7 @@ const confirmOrder = async(req,res,next)=>{
       key_secret: process.env.KEY_SECRET,
     });
     const { orderId, packageDatas } = req.body;
-    const {serviceId,selectedDate,selectedTimeSlot,selectedAddress} = packageDatas
+    const {serviceId,selectedDate,selectedTimeSlot,selectedAddress,vendorId} = packageDatas
     console.log(packageDatas,"ctrl")
     const order = await razorpayInstance.orders.fetch(orderId);
     
@@ -392,6 +393,7 @@ const confirmOrder = async(req,res,next)=>{
       const newOrder = new BookingModel({
       
         serviceId,
+        vendorId,
         userId:userId,
         selectedDate,
         selectedTimeSlot,

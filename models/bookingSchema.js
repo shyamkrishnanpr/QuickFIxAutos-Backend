@@ -11,6 +11,10 @@ const bookingSchema = new Schema({
         type:mongoose.Types.ObjectId,
         ref:"user"
     },
+    vendorId:{
+        type:mongoose.Types.ObjectId,
+        ref:"vendor"
+    },
     selectedDate:{
         type:Date
     },
@@ -25,7 +29,12 @@ const bookingSchema = new Schema({
     },
     paymentStatus:{
         type:String
-    }
+    },
+    status:{
+        type:String,
+        enum:['booked','cancelled','completed'],
+        default:"booked"
+    },
 
 })
 
