@@ -13,7 +13,8 @@ import {
   addService, 
   fetchService,
   addSlots,
-  getOrders
+  getOrders,
+  updateOrder
 } from "../controllers/serviceController.js";
 const serviceRoute = express.Router();
  
@@ -35,6 +36,7 @@ serviceRoute.get("/getServices",verification.verifyVendor, fetchService);
 serviceRoute.post("/addSlots",verification.verifyVendor,addSlots)
 
 serviceRoute.get("/getOrders",verification.verifyVendor,getOrders)
+serviceRoute.put("/updateOrder/:orderId/status",verification.verifyVendor,updateOrder)
 
  
 export default serviceRoute;

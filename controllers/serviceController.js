@@ -311,6 +311,7 @@ const addSlots = async (req, res, next) => {
 const getOrders = async (req, res, next) => {
   try {
     const vendorId = req.vendorId;
+    
     const orders = await BookingModel.aggregate([
       {
         $match: { vendorId: new ObjectId(req.vendorId) },
@@ -372,6 +373,7 @@ const getOrders = async (req, res, next) => {
           status: 1,
           userName:{$arrayElemAt:["$users.fullName",0]},
           phoneNumber:{$arrayElemAt:["$users.phoneNumber",0]},
+          email:{$arrayElemAt:["$users.email",0]},
       
           service: {
             _id: 1,
@@ -381,13 +383,15 @@ const getOrders = async (req, res, next) => {
             isVerified: 1,
             category: { $arrayElemAt: ["$category.category", 0] },
             subcategory: { $arrayElemAt: ["$subcategory.subCategory", 0] },
-            vehicle: { $arrayElemAt: ["$vehicle.brand", 0] },
+            vehicleBrand: { $arrayElemAt: ["$vehicle.brand", 0] },
+            VehicleModel:{$arrayElemAt:["$vehicle.model",0]}
+
           },
         },
       },
     ]);
 
-    console.log(orders, "at controller");
+    // console.log(orders, "at controller");
 
     res.json(orders);
   } catch (error) {
@@ -395,6 +399,29 @@ const getOrders = async (req, res, next) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+const updateOrder = async(req,res,next)=>{
+  try {
+    const orderId  = req.params.orderId
+    const newStatus = req.body.status
+
+    console.log(orderId,newStatus,"at cntrol")
+
+    const updateOrder = await BookingModel.findByIdAndUpdate(
+      orderId,
+      {status:newStatus},
+      {new:true}
+    )
+    if(!updateOrder){
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    return res.status(200).json(updateOrder);
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export {
   signUp,
@@ -410,4 +437,5 @@ export {
   fetchService,
   addSlots,
   getOrders,
+  updateOrder
 };
