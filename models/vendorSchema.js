@@ -27,6 +27,11 @@ const vendorSchema = new Schema({
     longitude:{
         type:Number
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin', 'vendor'], 
+        default: 'vendor', 
+      },
 
     address:[
         {

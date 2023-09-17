@@ -18,6 +18,11 @@ const userSchema = new Schema({
         type:Boolean,
         default:false
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin', 'vendor'], 
+        default: 'user', 
+      },
     address:[
         {
             area:{

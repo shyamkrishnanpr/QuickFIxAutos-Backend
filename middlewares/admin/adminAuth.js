@@ -5,7 +5,7 @@ dotenv.config();
 
 const verifyAdmin = (req, res, next) => {
   const tokenData = req.header("Authorization");
-  console.log("tokendata in mid", tokenData);
+
   if (!tokenData) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -13,9 +13,14 @@ const verifyAdmin = (req, res, next) => {
   try {
     const token = tokenData.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded) {
+
+    if (decoded && decoded.role === "admin") {
       next();
-    }   
+    } else {
+      return res
+        .status(403)
+        .json({ message: "Access denied. Admin role required" });
+    }
   } catch (error) {
     console.log("error in auth", error);
   }

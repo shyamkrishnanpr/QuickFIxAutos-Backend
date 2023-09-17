@@ -21,6 +21,7 @@ const login = (req, res, next) => {
     ) {
       const payload = {
         email: email,
+        role:"admin"
       };
 
       jwt.sign(
