@@ -1,6 +1,7 @@
 import express from "express";
 const userRoutes = express.Router();
 import verification from "../middlewares/user/userAuth.js";
+
 import {
   signUp,
   verifyOtp,
@@ -18,6 +19,8 @@ import {
   payment,
   confirmOrder
 } from "../controllers/userController.js";
+
+import { privateChat ,getChatConversation} from "../controllers/userChatController.js";
 
 userRoutes.post("/signUp", signUp);
 userRoutes.post("/verifyOtp", verifyOtp);
@@ -38,6 +41,11 @@ userRoutes.post("/booking",verification.verifyUser,booking)
 
 userRoutes.post("/orders",verification.verifyUser,payment)
 userRoutes.post("/order",verification.verifyUser,confirmOrder)
+
+userRoutes.post('/chat-sendmessage/:vendorId/:userId',privateChat);
+userRoutes.get('/chat-conversations/:vendorId/:userId',getChatConversation);
+
+
 
 
 export default userRoutes;
