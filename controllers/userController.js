@@ -12,6 +12,8 @@ import jwt from "jsonwebtoken";
 import { response } from "express";
 import geolib from "geolib";
 import Razorpay from 'razorpay'
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 
 const secretKey = process.env.JWT_SECRET;
@@ -134,7 +136,7 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { fullName: user.fullName, email: user.email, id: user._id },
+      { fullName: user.fullName, email: user.email, id: user._id,name:user.fullName },
       secretKey
     );
 
@@ -418,6 +420,144 @@ const confirmOrder = async(req,res,next)=>{
   }
 }
 
+const runningOrdersFetch = async(req,res,next)=>{
+  try {
+    const userId = req.userId
+  
+    const orders = await BookingModel.aggregate([
+      {
+        $match: {
+          status: "booked",
+          userId:new ObjectId(userId)
+        }
+      },
+   
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      {
+        $unwind: "$service",
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "service.categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $lookup: {
+          from: "vehicles",
+          localField: "service.vehicleId",
+          foreignField: "_id",
+          as: "vehicle",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          selectedDate: 1,
+          selectedTimeSlot: 1,
+          selectedAddress: 1,
+          paymentMethod: 1,
+          paymentStatus: 1,
+          status: 1,
+          vehicleBrand:"$vehicle.brand",
+          vehicleModel:"$vehicle.model",
+          categoryName: "$category.category",
+          Price:"$service.price"
+      
+        }
+      }
+    ])
+  
+
+     
+    console.log(orders)
+    
+    res.json(orders)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+const completedOrdersFetch = async(req,res,next)=>{
+  try {
+    const userId = req.userId
+  
+    const orders = await BookingModel.aggregate([
+      {
+        $match: {
+          status: { $in: ["completed", "cancelled"] },
+          userId:new ObjectId(userId)
+        }
+      },
+   
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      {
+        $unwind: "$service",
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "service.categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $lookup: {
+          from: "vehicles",
+          localField: "service.vehicleId",
+          foreignField: "_id",
+          as: "vehicle",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          selectedDate: 1,
+          selectedTimeSlot: 1,
+          selectedAddress: 1,
+          paymentMethod: 1,
+          paymentStatus: 1,
+          status: 1,
+          vehicleBrand:"$vehicle.brand",
+          vehicleModel:"$vehicle.model",
+          categoryName: "$category.category",
+          Price:"$service.price"
+      
+        }
+      }
+    ])
+  
+
+     
+    console.log(orders)
+    
+    res.json(orders)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+
 
 
 export {
@@ -435,5 +575,7 @@ export {
   banners,
   booking,
   payment,
-  confirmOrder
+  confirmOrder,
+  runningOrdersFetch,
+  completedOrdersFetch
 };
