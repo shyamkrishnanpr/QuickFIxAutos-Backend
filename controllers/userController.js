@@ -11,10 +11,9 @@ import { compareOtp } from "../helpers/nodeMailer/compareOtp.js";
 import jwt from "jsonwebtoken";
 import { response } from "express";
 import geolib from "geolib";
-import Razorpay from 'razorpay'
+import Razorpay from "razorpay";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
-
 
 const secretKey = process.env.JWT_SECRET;
 
@@ -136,7 +135,12 @@ const login = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { fullName: user.fullName, email: user.email, id: user._id,name:user.fullName },
+      {
+        fullName: user.fullName,
+        email: user.email,
+        id: user._id,
+        name: user.fullName,
+      },
       secretKey
     );
 
@@ -233,10 +237,15 @@ const resetPassword = async (req, res, next) => {
 
 const fetchServices = async (req, res, next) => {
   try {
-    const { userLocation } = req.body;
+    const { userLocation, category } = req.body;
     const vehicleId = userLocation.vehicleId;
-    // console.log("vehicleid is ", vehicleId);
-    // console.log(req.body, "cntrller");
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 3;
+    const skip = (page - 1) * pageSize;
+
+    console.log(page,"page number is ")
+   
+  
     const maxDistance = 10 * 5000;
 
     const vendors = await VendorModel.find();
@@ -251,18 +260,40 @@ const fetchServices = async (req, res, next) => {
       return distance <= maxDistance;
     });
     const services = [];
+    let totalcount
 
     for (const vendor of nearByVendors) {
+      const count = await serviceModel
+        .find({
+          vendorId: vendor._id,
+          isVerified: true,
+          vehicleId: vehicleId,
+          categoryId: category,
+        })
+        .count();
+        console.log(count,"cont")
+        totalcount=count
+
       const vendorServices = await serviceModel
-        .find({ vendorId: vendor._id, isVerified: true, vehicleId: vehicleId })
+        .find({
+          vendorId: vendor._id,
+          isVerified: true,
+          vehicleId: vehicleId,
+          categoryId: category,
+        })
+        .skip(skip)
+        .limit(pageSize)
         .populate("vendorId")
         .populate("categoryId")
         .populate("subCategoryId")
         .populate("vehicleId");
+
       services.push(...vendorServices);
     }
 
-    res.json(services);
+   
+
+    res.json({services,totalcount});
   } catch (error) {
     console.log(error);
   }
@@ -278,7 +309,7 @@ const serviceDetailFetch = async (req, res, next) => {
       .populate("categoryId")
       .populate("subCategoryId")
       .populate("vehicleId");
- 
+
     res.json(serviceDetails);
   } catch (error) {
     console.log(error);
@@ -305,57 +336,64 @@ const vehicleData = async (req, res, next) => {
   }
 };
 
-
-const banners = async(req,res,next)=>{
+const banners = async (req, res, next) => {
   try {
-    const banners = await BannerModel.find()
-    console.log(banners,"atb")
-    res.json(banners)
+    const banners = await BannerModel.find();
+    console.log(banners, "atb");
+    res.json(banners);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-
-const booking = async(req,res,next)=>{
+const booking = async (req, res, next) => {
   try {
-    const userId = req.userId
+    const userId = req.userId;
 
-    console.log(userId,"at booking")
-    const { serviceId,vendorId, selectedDate, selectedTimeSlot, selectedAddress, paymentMethod } = req.body;
-    console.log(req.body,"atcntrl")
-
-    const booking = new BookingModel({
+    console.log(userId, "at booking");
+    const {
       serviceId,
       vendorId,
-      userId:userId,
       selectedDate,
       selectedTimeSlot,
       selectedAddress,
       paymentMethod,
-      paymentStatus:"Pending"
-    })
+    } = req.body;
+    console.log(req.body, "atcntrl");
 
-    await booking.save()
+    const booking = new BookingModel({
+      serviceId,
+      vendorId,
+      userId: userId,
+      selectedDate,
+      selectedTimeSlot,
+      selectedAddress,
+      paymentMethod,
+      paymentStatus: "Pending",
+    });
 
-    res.status(201).json({ message: 'Booking successfully saved.' });
+    await booking.save();
+
+    res.status(201).json({ message: "Booking successfully saved." });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'An error occurred while saving the booking.' });
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while saving the booking." });
   }
-}
+};
 
-const payment = async(req,res,next)=>{
+const payment = async (req, res, next) => {
   try {
-    const {order_id,amount,payment_capture} = req.body
+    const { order_id, amount, payment_capture } = req.body;
     const razorpayInstance = new Razorpay({
-      key_id:process.env.KEY_ID,
-      key_secret:process.env.KEY_SECRET
-    })
+      key_id: process.env.KEY_ID,
+      key_secret: process.env.KEY_SECRET,
+    });
 
     const option = {
       receipt: order_id,
-      amount: amount*100 ,
+      amount: amount * 100,
       currency: "INR",
       payment_capture: payment_capture,
     };
@@ -367,41 +405,45 @@ const payment = async(req,res,next)=>{
 
     res.status(200).json({ success: true, data: order });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const confirmOrder = async(req,res,next)=>{
+const confirmOrder = async (req, res, next) => {
   try {
-     const userId = req.userId
+    const userId = req.userId;
 
-     console.log(userId,"at cntdd")
+    console.log(userId, "at cntdd");
 
     const razorpayInstance = new Razorpay({
       key_id: process.env.KEY_ID,
       key_secret: process.env.KEY_SECRET,
     });
     const { orderId, packageDatas } = req.body;
-    const {serviceId,selectedDate,selectedTimeSlot,selectedAddress,vendorId} = packageDatas
-    console.log(packageDatas,"ctrl")
+    const {
+      serviceId,
+      selectedDate,
+      selectedTimeSlot,
+      selectedAddress,
+      vendorId,
+    } = packageDatas;
+    console.log(packageDatas, "ctrl");
     const order = await razorpayInstance.orders.fetch(orderId);
-    
-    if (!order) return res.status(500).send("somthing error");
 
+    if (!order) return res.status(500).send("somthing error");
 
     if (order.status === "paid") {
       console.log("payment successs");
 
       const newOrder = new BookingModel({
-      
         serviceId,
         vendorId,
-        userId:userId,
+        userId: userId,
         selectedDate,
         selectedTimeSlot,
         selectedAddress,
-        paymentMethod:"Online",
-        paymentStatus:"Paid"
+        paymentMethod: "Online",
+        paymentStatus: "Paid",
       });
       newOrder
         .save()
@@ -416,22 +458,22 @@ const confirmOrder = async(req,res,next)=>{
         });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const runningOrdersFetch = async(req,res,next)=>{
+const runningOrdersFetch = async (req, res, next) => {
   try {
-    const userId = req.userId
-  
+    const userId = req.userId;
+
     const orders = await BookingModel.aggregate([
       {
         $match: {
           status: "booked",
-          userId:new ObjectId(userId)
-        }
+          userId: new ObjectId(userId),
+        },
       },
-   
+
       {
         $lookup: {
           from: "services",
@@ -468,38 +510,34 @@ const runningOrdersFetch = async(req,res,next)=>{
           paymentMethod: 1,
           paymentStatus: 1,
           status: 1,
-          vehicleBrand:"$vehicle.brand",
-          vehicleModel:"$vehicle.model",
+          vehicleBrand: "$vehicle.brand",
+          vehicleModel: "$vehicle.model",
           categoryName: "$category.category",
-          Price:"$service.price"
-      
-        }
-      }
-    ])
-  
+          Price: "$service.price",
+        },
+      },
+    ]);
 
-     
-    console.log(orders)
-    
-    res.json(orders)
+    console.log(orders);
+
+    res.json(orders);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-
-const completedOrdersFetch = async(req,res,next)=>{
+const completedOrdersFetch = async (req, res, next) => {
   try {
-    const userId = req.userId
-  
+    const userId = req.userId;
+
     const orders = await BookingModel.aggregate([
       {
         $match: {
           status: { $in: ["completed", "cancelled"] },
-          userId:new ObjectId(userId)
-        }
+          userId: new ObjectId(userId),
+        },
       },
-   
+
       {
         $lookup: {
           from: "services",
@@ -536,29 +574,21 @@ const completedOrdersFetch = async(req,res,next)=>{
           paymentMethod: 1,
           paymentStatus: 1,
           status: 1,
-          vehicleBrand:"$vehicle.brand",
-          vehicleModel:"$vehicle.model",
+          vehicleBrand: "$vehicle.brand",
+          vehicleModel: "$vehicle.model",
           categoryName: "$category.category",
-          Price:"$service.price"
-      
-        }
-      }
-    ])
-  
+          Price: "$service.price",
+        },
+      },
+    ]);
 
-     
-    console.log(orders)
-    
-    res.json(orders)
+    console.log(orders);
+
+    res.json(orders);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
-
-
-
-
-
+};
 
 export {
   signUp,
@@ -577,5 +607,5 @@ export {
   payment,
   confirmOrder,
   runningOrdersFetch,
-  completedOrdersFetch
+  completedOrdersFetch,
 };
