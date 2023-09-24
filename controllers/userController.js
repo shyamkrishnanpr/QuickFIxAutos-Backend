@@ -590,6 +590,20 @@ const completedOrdersFetch = async (req, res, next) => {
   }
 };
 
+const cancelOrder = async(req,res,next)=>{
+  try {
+    const orderId = req.params.id
+    const responce = await BookingModel.findByIdAndUpdate(
+      orderId,
+      {status:"cancelled"},
+      {new:true}
+    )
+    res.json(responce)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   signUp,
   verifyOtp,
@@ -608,4 +622,5 @@ export {
   confirmOrder,
   runningOrdersFetch,
   completedOrdersFetch,
+  cancelOrder
 };

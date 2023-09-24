@@ -19,7 +19,8 @@ import {
   payment,
   confirmOrder,
   runningOrdersFetch,
-  completedOrdersFetch
+  completedOrdersFetch,
+  cancelOrder
 } from "../controllers/userController.js";
 
 import { privateChat ,getChatConversation} from "../controllers/userChatController.js";
@@ -45,6 +46,7 @@ userRoutes.post("/orders",verification.verifyUser,payment)
 userRoutes.post("/order",verification.verifyUser,confirmOrder)
 userRoutes.get("/runningOrders",verification.verifyUser,runningOrdersFetch)
 userRoutes.get("/completedOrders",verification.verifyUser,completedOrdersFetch)
+userRoutes.patch("/cancelOrder/:id",verification.verifyUser,cancelOrder)
 
 
 userRoutes.post('/chat-sendmessage/:vendorId/:userId',privateChat);
