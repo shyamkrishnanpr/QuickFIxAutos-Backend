@@ -243,9 +243,8 @@ const fetchServices = async (req, res, next) => {
     const pageSize = 3;
     const skip = (page - 1) * pageSize;
 
-    console.log(page,"page number is ")
-   
-  
+    console.log(page, "page number is ");
+
     const maxDistance = 10 * 5000;
 
     const vendors = await VendorModel.find();
@@ -260,7 +259,7 @@ const fetchServices = async (req, res, next) => {
       return distance <= maxDistance;
     });
     const services = [];
-    let totalcount
+    let totalcount;
 
     for (const vendor of nearByVendors) {
       const count = await serviceModel
@@ -271,8 +270,8 @@ const fetchServices = async (req, res, next) => {
           categoryId: category,
         })
         .count();
-        console.log(count,"cont")
-        totalcount=count
+      console.log(count, "cont");
+      totalcount = count;
 
       const vendorServices = await serviceModel
         .find({
@@ -291,9 +290,7 @@ const fetchServices = async (req, res, next) => {
       services.push(...vendorServices);
     }
 
-   
-
-    res.json({services,totalcount});
+    res.json({ services, totalcount });
   } catch (error) {
     console.log(error);
   }
@@ -518,7 +515,7 @@ const runningOrdersFetch = async (req, res, next) => {
       },
     ]);
 
-    console.log(orders);
+
 
     res.json(orders);
   } catch (error) {
@@ -582,7 +579,7 @@ const completedOrdersFetch = async (req, res, next) => {
       },
     ]);
 
-    console.log(orders);
+   
 
     res.json(orders);
   } catch (error) {
@@ -590,19 +587,28 @@ const completedOrdersFetch = async (req, res, next) => {
   }
 };
 
-const cancelOrder = async(req,res,next)=>{
+const cancelOrder = async (req, res, next) => {
   try {
-    const orderId = req.params.id
+    const orderId = req.params.id;
+    const userId = req.userId;
+
+    const order = await BookingModel.findById(orderId);
+
+    if (order.userId != userId) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to cancel this order" });
+    }
     const responce = await BookingModel.findByIdAndUpdate(
       orderId,
-      {status:"cancelled"},
-      {new:true}
-    )
-    res.json(responce)
+      { status: "cancelled" },
+      { new: true }
+    );
+    res.json(responce);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
 export {
   signUp,
@@ -622,5 +628,5 @@ export {
   confirmOrder,
   runningOrdersFetch,
   completedOrdersFetch,
-  cancelOrder
+  cancelOrder,
 };
