@@ -30,7 +30,7 @@ const server = createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: ["http://localhost:3005"],
+    origin: ["http://localhost:3005","https://quickfixautos.netlify.app"],
   },
 });
 
