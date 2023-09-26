@@ -15,13 +15,7 @@ const port = process.env.PORT ||3000;
 dotenv.config();
 db();
 const app = express();
-// const allowedOrigins = ["http://localhost:3005", "https://quickfixautos.netlify.app"];
-// app.use(cors({
-//   origin: allowedOrigins,
-//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
-//   credentials: true, 
-// }));
-// app.options('*',cors())
+
 
 const allowedOrigins = ["http://localhost:3005", "https://quickfixautos.netlify.app"];
 const corsOptions = {
@@ -33,17 +27,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(function (req, res, next) {
 
-  res.header('Access-Control-Allow-Origin', allowedOrigins);
-  res.header('Access-Control-Allow-Headers', true);
-  res.header('Access-Control-Allow-Credentials',true);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  next();
-});
-
-// Handle preflight (OPTIONS) requests for all routes
-app.options('*', cors(corsOptions));
 
 
 
