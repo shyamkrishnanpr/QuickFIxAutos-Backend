@@ -5,7 +5,7 @@ import path from "path";
 import db from "./config/config.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
-
+import morgan from "morgan";
 import adminRouter from "./routes/adminRoutes.js";
 import serviceRoute from "./routes/serviceRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -25,6 +25,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use(morgan('dev'))
 
 const server = createServer(app);
 const io = new Server(server, {
