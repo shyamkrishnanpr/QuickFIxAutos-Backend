@@ -17,7 +17,7 @@ db();
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:3005","https://quickfixautos.netlify.app"], 
+  origin: ["http://localhost:3005","https://quickfixautos.netlify.app","*"], 
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true, 
 }));
