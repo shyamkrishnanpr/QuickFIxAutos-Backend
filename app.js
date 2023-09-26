@@ -10,7 +10,7 @@ import adminRouter from "./routes/adminRoutes.js";
 import serviceRoute from "./routes/serviceRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
-const port = process.env.PORT;
+const port = process.env.PORT ||3000;
 
 dotenv.config();
 db();
@@ -21,6 +21,7 @@ app.use(cors({
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true, 
 }));
+app.options('*',cors())
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
