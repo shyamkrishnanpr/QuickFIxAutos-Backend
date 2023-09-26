@@ -17,9 +17,9 @@ db();
 const app = express();
 
 
-const allowedOrigins = ["http://localhost:3005", "https://quickfixautos.netlify.app",'*'];
+const allowedOrigins = ["http://localhost:3005", "https://quickfixautos.netlify.app"];
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: '*',
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   
