@@ -15,9 +15,9 @@ const port = process.env.PORT;
 dotenv.config();
 db();
 const app = express();
-
+const allowedOrigins = ["http://localhost:3005", "https://quickfixautos.netlify.app"];
 app.use(cors({
-  origin: ["http://localhost:3005","https://quickfixautos.netlify.app","*"], 
+  origin: allowedOrigins,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", 
   credentials: true, 
 }));
@@ -31,7 +31,7 @@ const server = createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: ["http://localhost:3005","https://quickfixautos.netlify.app"],
+    origin:allowedOrigins
   },
 });
 
