@@ -18,7 +18,7 @@ const app = express();
 const server = createServer(app);
 
 const corsOptions = {
-  origin: 'https://quickfixautos.netlify.app', 
+  origin: '*', 
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true, 
 };
@@ -39,7 +39,7 @@ const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
     credentials: true,
-    origin: ["https://quickfixautos.netlify.app", "http://localhost:3005"],
+    origin:'*'
   },
 });
 
