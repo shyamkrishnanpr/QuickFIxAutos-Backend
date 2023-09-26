@@ -15,17 +15,7 @@ const port = process.env.PORT ||3000;
 dotenv.config();
 db();
 const app = express();
-
-
-const allowedOrigins = ["http://localhost:3005", "https://quickfixautos.netlify.app"];
-const corsOptions = {
-  origin: "https://quickfixautos.netlify.app",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  
-};
-
-app.use(cors(corsOptions));
+const server = createServer(app);
 
 
 app.use((req, res, next) => {                      
@@ -38,8 +28,11 @@ app.use((req, res, next) => {
 });
 
 
-
-
+app.use(cors({
+  credentials: true,
+  origin: ["https://quickfixautos.netlify.app","http://localhost:3005"],
+  methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+}))
 
 
 
@@ -48,13 +41,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(morgan('dev'))
+app.use("/admin", adminRouter);
+app.use("/vendor", serviceRoute);
+app.use("/user", userRoutes);
 
-const server = createServer(app);
+
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
     credentials: true,
-    origin:"https://quickfixautos.netlify.app"
+    origin:["https://quickfixautos.netlify.app","http://localhost:3005"]
   },
 });
 
@@ -99,9 +95,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use("/admin", adminRouter);
-app.use("/vendor", serviceRoute);
-app.use("/user", userRoutes);
+
 
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
