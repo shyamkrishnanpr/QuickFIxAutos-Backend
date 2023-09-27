@@ -17,15 +17,15 @@ db();
 const app = express();
 const server = createServer(app);
 
-const corsOptions = {
-  origin: '*', 
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, 
-};
 
-app.use(cors(corsOptions));
-    
 
+app.use(
+  cors({
+    credentials: true,
+    origin: ["https://quickfixautos.netlify.app", "http://quickfixautos.netlify.app", "http://localhost:3005"],
+    methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -39,7 +39,7 @@ const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
     credentials: true,
-    origin:'*'
+    origin: ["https://quickfixautos.netlify.app/", "http://localhost:3005"],
   },
 });
 
