@@ -65,10 +65,10 @@ const Category = async (req, res, next) => {
 
 const addCategory = async (req, res, next) => {
   try {
-    const {category} = req.body;
+    const category = req.body;
     console.log(category);
 
-    const existingCategory = await CategoryModel.findOne({category})
+    const existingCategory = await CategoryModel.findOne({category:category})
     if (existingCategory) {
       return res.status(400).json({ error: 'Category already exists.' });
     }
