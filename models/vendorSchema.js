@@ -62,7 +62,7 @@ const vendorSchema = new Schema({
     ]
 
 
-})
+},{timestamps: true})
 
 const VendorModel = mongoose.model("vendor",vendorSchema)
 export default VendorModel

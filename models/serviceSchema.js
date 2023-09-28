@@ -31,7 +31,7 @@ const serviceSchema = new Schema({
         type:Boolean,
         default:false
     }
-})
+},{timestamps: true})
 
 const serviceModel = mongoose.model("services",serviceSchema)
 export default serviceModel
