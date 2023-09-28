@@ -6,8 +6,10 @@ import BannerModel from "../models/bannerSchema.js";
 import UserModel from "../models/userSchema.js";
 import VendorModel from "../models/vendorSchema.js";
 import serviceModel from "../models/serviceSchema.js";
+import BookingModel from "../models/bookingSchema.js";
 import { response } from "express";
 import fs from "fs";
+import { pipeline } from "stream";
 
 //admin login controller
 const login = (req, res, next) => {
@@ -84,11 +86,11 @@ const editCategory = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { newName } = req.body;
-    const existingCategory = await CategoryModel.findOne({ category:newName });
+    const existingCategory = await CategoryModel.findOne({ category: newName });
     if (existingCategory) {
       return res.status(400).json({ error: "Category name already exists." });
     }
-   
+
     const category = await CategoryModel.findByIdAndUpdate(
       id,
       { category: newName },
@@ -327,6 +329,219 @@ const banners = async (req, res, next) => {
   }
 };
 
+const dashboardData = async (req, res, next) => {
+  try {
+    const totalUsers = await UserModel.countDocuments({
+      isBlock: false,
+    });
+
+    const totalVendors = await VendorModel.countDocuments({
+      isBlock: false,
+    });
+
+    const totalbookings = await BookingModel.countDocuments();
+
+    const totalServices = await serviceModel.countDocuments({
+      isVerified: true,
+    });
+
+    const data = {
+      totalUsers,
+      totalVendors,
+      totalbookings,
+      totalServices,
+    };
+
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const displayCharts = async (req, res, next) => {
+  try {
+    const FIRST_MONTH = 1;
+    const LAST_MONTH = 12;
+    const TODAY = new Date();
+    const YEAR_BEFORE = new Date(TODAY);
+    YEAR_BEFORE.setFullYear(YEAR_BEFORE.getFullYear() - 1);
+    console.log(TODAY, YEAR_BEFORE);
+    const MONTHS_ARRAY = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const pipeLine = [
+      {
+        $match: {
+          createdAt: { $gte: YEAR_BEFORE, $lte: TODAY },
+        },
+      },
+      {
+        $group: {
+          _id: { year_month: { $substrCP: ["$createdAt", 0, 7] } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { "_id.year_month": 1 },
+      },
+      {
+        $project: {
+          _id: 0,
+          count: 1,
+          month_year: {
+            $concat: [
+              {
+                $arrayElemAt: [
+                  MONTHS_ARRAY,
+                  {
+                    $subtract: [
+                      { $toInt: { $substrCP: ["$_id.year_month", 5, 2] } },
+                      1,
+                    ],
+                  },
+                ],
+              },
+              "-",
+              { $substrCP: ["$_id.year_month", 0, 4] },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          data: { $push: { k: "$month_year", v: "$count" } },
+        },
+      },
+      {
+        $addFields: {
+          start_year: { $substrCP: [YEAR_BEFORE, 0, 4] },
+          end_year: { $substrCP: [TODAY, 0, 4] },
+          months1: {
+            $range: [
+              { $toInt: { $substrCP: [YEAR_BEFORE, 5, 2] } },
+              { $add: [LAST_MONTH, 1] },
+            ],
+          },
+          months2: {
+            $range: [
+              FIRST_MONTH,
+              { $add: [{ $toInt: { $substrCP: [TODAY, 5, 2] } }, 1] },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          template_data: {
+            $concatArrays: [
+              {
+                $map: {
+                  input: "$months1",
+                  as: "m1",
+                  in: {
+                    count: 0,
+                    month_year: {
+                      $concat: [
+                        {
+                          $arrayElemAt: [
+                            MONTHS_ARRAY,
+                            { $subtract: ["$$m1", 1] },
+                          ],
+                        },
+                        "-",
+                        "$start_year",
+                      ],
+                    },
+                  },
+                },
+              },
+              {
+                $map: {
+                  input: "$months2",
+                  as: "m2",
+                  in: {
+                    count: 0,
+                    month_year: {
+                      $concat: [
+                        {
+                          $arrayElemAt: [
+                            MONTHS_ARRAY,
+                            { $subtract: ["$$m2", 1] },
+                          ],
+                        },
+                        "-",
+                        "$end_year",
+                      ],
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          data: {
+            $map: {
+              input: "$template_data",
+              as: "t",
+              in: {
+                k: "$$t.month_year",
+                v: {
+                  $reduce: {
+                    input: "$data",
+                    initialValue: 0,
+                    in: {
+                      $cond: [
+                        { $eq: ["$$t.month_year", "$$this.k"] },
+                        { $add: ["$$this.v", "$$value"] },
+                        { $add: [0, "$$value"] },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          data: { $arrayToObject: "$data" },
+          _id: 0,
+        },
+      },
+    ];
+
+    const serviceChart = await serviceModel.aggregate(pipeLine);
+    const bookingChart = await BookingModel.aggregate(pipeLine)
+    const usersChart = await UserModel.aggregate(pipeLine)
+    const vendorChart = await VehicleModel.aggregate(pipeLine)
+
+    res.json({
+      serviceChart,
+      bookingChart,
+      usersChart,
+      vendorChart
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   login,
   Category,
@@ -349,4 +564,6 @@ export {
   getAllService,
   addBanner,
   banners,
+  dashboardData,
+  displayCharts,
 };
