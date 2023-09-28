@@ -10,7 +10,21 @@ const vehicleSchema = new Schema({
     },
     image:{
         type:String
-    }
+    },
+
+    vehicleImages:[
+        {
+            public_id:{
+                type:String,
+                required:true
+            },
+            url:{
+                type:String,
+                required:true
+            }
+
+        }
+    ],
 })
 
 const VehicleModel = mongoose.model("vehicles",vehicleSchema)

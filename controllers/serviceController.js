@@ -219,17 +219,18 @@ const vehicleData = async (req, res, next) => {
 const fetchService = async (req, res, next) => {
   try {
     const vendorId = req.vendorId;
-    const page = req.query.page || 1;
-    console.log("page", page);
-    const perPage = req.query.perPage || 2;
+    // const page = req.query.page || 1;
+    // console.log("page", page);
+    // const perPage = req.query.perPage || 2;
 
     const services = await serviceModel
       .find({ vendorId: vendorId })
       .populate("categoryId")
       .populate("subCategoryId")
       .populate("vehicleId")
-      .skip((page - 1) * perPage)
-      .limit(perPage);
+      
+      // .skip((page - 1) * perPage)
+      // .limit(perPage);
 
     // console.log("at cntrller service fetched is ",services)
     res.json(services);

@@ -1,5 +1,5 @@
 import express from "express";
-import { upload } from "../middlewares/multer/config.js";
+import uploadImage  from "../middlewares/multer/config.js";
 import verification from '../middlewares/admin/adminAuth.js'
 import {
   login,
@@ -42,7 +42,7 @@ adminRoute.delete("/deleteSubCategory/:id",verification.verifyAdmin,deleteSubCat
 adminRoute.put("/editSubCategory/:id",verification.verifyAdmin,editSubCategory)
  
 adminRoute.get("/vehicles",verification.verifyAdmin,vehicles)
-adminRoute.post("/addVehicle",upload.single('image'),verification.verifyAdmin,addVehicle)
+adminRoute.post("/addVehicle",verification.verifyAdmin,uploadImage,addVehicle)
 adminRoute.delete("/deleteVehicle/:id",verification.verifyAdmin,deleteVehicle)
 
 adminRoute.get("/users",verification.verifyAdmin,fetchUsers)
@@ -55,7 +55,7 @@ adminRoute.get("/getServices",verification.verifyAdmin,getServices)
 adminRoute.patch("/verifyService/:id",verification.verifyAdmin,verifyService)
 adminRoute.get("/getAllService",verification.verifyAdmin,getAllService)
 
-adminRoute.post("/addBanner",upload.single('newBanner'),verification.verifyAdmin,addBanner)
+adminRoute.post("/addBanner",verification.verifyAdmin,uploadImage,addBanner)
 adminRoute.get("/getBanner",verification.verifyAdmin,banners)
 
 adminRoute.get("/dashboardData",verification.verifyAdmin,dashboardData)

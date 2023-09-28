@@ -175,10 +175,22 @@ const vehicles = async (req, res, next) => {
 const addVehicle = async (req, res, next) => {
   try {
     const vehicle = req.body;
+
     console.log(vehicle);
-    vehicle.image = req.file.filename;
-    console.log(vehicle.image);
-    await VehicleModel.create(vehicle);
+
+    const { path, filename } = req.file;
+
+    console.log(req.file,"file")
+
+    const newvehicle = new VehicleModel({
+      brand: vehicle.brand,
+      model: vehicle.model,
+      vehicleImages: {
+        public_id: filename,
+        url: path,
+      },
+    });
+    await newvehicle.save();
     res.json(vehicle);
   } catch (error) {
     console.log(error);
@@ -305,15 +317,17 @@ const getAllService = async (req, res, next) => {
 
 const addBanner = async (req, res, next) => {
   try {
-    const banner = req.body;
-    banner.bannerImage = req.file.filename;
+    
 
-    console.log(banner.bannerImage, "buuuu");
+    console.log(req.file,"at banner")
+    const { path, filename } = req.file;
 
-    await BannerModel.create(banner);
-    res.json(banner);
+   
 
-    console.log(banner, "add banner cntroller");
+    // await BannerModel.create(banner);
+    // res.json(banner);
+    
+    // console.log(banner, "add banner cntroller");
   } catch (error) {
     console.log(error);
   }
@@ -527,16 +541,15 @@ const displayCharts = async (req, res, next) => {
     ];
 
     const serviceChart = await serviceModel.aggregate(pipeLine);
-    const bookingChart = await BookingModel.aggregate(pipeLine)
-    const vendorChart = await VendorModel.aggregate(pipeLine)
-    const usersChart = await UserModel.aggregate(pipeLine)
-   
+    const bookingChart = await BookingModel.aggregate(pipeLine);
+    const vendorChart = await VendorModel.aggregate(pipeLine);
+    const usersChart = await UserModel.aggregate(pipeLine);
 
     res.json({
       serviceChart,
       bookingChart,
       usersChart,
-      vendorChart
+      vendorChart,
     });
   } catch (error) {
     console.log(error);
