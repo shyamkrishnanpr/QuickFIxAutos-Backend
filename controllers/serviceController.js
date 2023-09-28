@@ -4,6 +4,7 @@ import SubCategoryModel from "../models/subCategorySchema.js";
 import VehicleModel from "../models/vehicleSchema.js";
 import serviceModel from "../models/serviceSchema.js";
 import BookingModel from "../models/bookingSchema.js";
+import UserModel from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import { genSalt } from "bcrypt";
 import { mailOtpGenerator } from "../helpers/nodeMailer/mailOtpGenerator.js";
@@ -11,6 +12,7 @@ import { response } from "express";
 import { compareOtp } from "../helpers/nodeMailer/compareOtp.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+
 const ObjectId = mongoose.Types.ObjectId;
 
 const secretKey = process.env.JWT_SECRET;
@@ -311,18 +313,18 @@ const addSlots = async (req, res, next) => {
 const getOrders = async (req, res, next) => {
   try {
     const vendorId = req.vendorId;
-    
+
     const orders = await BookingModel.aggregate([
       {
         $match: { vendorId: new ObjectId(req.vendorId) },
       },
       {
-        $lookup:{
-          from:"users",
-          localField:"userId",
-          foreignField:"_id",
-          as:"users"
-        }
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "users",
+        },
       },
       {
         $lookup: {
@@ -371,10 +373,10 @@ const getOrders = async (req, res, next) => {
           paymentMethod: 1,
           paymentStatus: 1,
           status: 1,
-          userName:{$arrayElemAt:["$users.fullName",0]},
-          phoneNumber:{$arrayElemAt:["$users.phoneNumber",0]},
-          email:{$arrayElemAt:["$users.email",0]},
-      
+          userName: { $arrayElemAt: ["$users.fullName", 0] },
+          phoneNumber: { $arrayElemAt: ["$users.phoneNumber", 0] },
+          email: { $arrayElemAt: ["$users.email", 0] },
+
           service: {
             _id: 1,
             price: 1,
@@ -384,8 +386,7 @@ const getOrders = async (req, res, next) => {
             category: { $arrayElemAt: ["$category.category", 0] },
             subcategory: { $arrayElemAt: ["$subcategory.subCategory", 0] },
             vehicleBrand: { $arrayElemAt: ["$vehicle.brand", 0] },
-            VehicleModel:{$arrayElemAt:["$vehicle.model",0]}
-
+            VehicleModel: { $arrayElemAt: ["$vehicle.model", 0] },
           },
         },
       },
@@ -400,28 +401,93 @@ const getOrders = async (req, res, next) => {
   }
 };
 
-
-const updateOrder = async(req,res,next)=>{
+const updateOrder = async (req, res, next) => {
   try {
-    const orderId  = req.params.orderId
-    const newStatus = req.body.status
+    const orderId = req.params.orderId;
+    const newStatus = req.body.status;
 
-    console.log(orderId,newStatus,"at cntrol")
+    console.log(orderId, newStatus, "at cntrol");
 
     const updateOrder = await BookingModel.findByIdAndUpdate(
       orderId,
-      {status:newStatus},
-      {new:true}
-    )
-    if(!updateOrder){
+      { status: newStatus },
+      { new: true }
+    );
+    if (!updateOrder) {
       return res.status(404).json({ error: "Order not found" });
     }
 
     return res.status(200).json(updateOrder);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
+
+const dashboardData = async (req, res, next) => {
+  try {
+    const vendorId = req.vendorId;
+
+    const orderTotal = await BookingModel.aggregate([
+      { $match: { vendorId: new ObjectId(vendorId), status: "completed" } },
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      {
+        $unwind: "$service",
+      },
+      {
+        $group: {
+          _id: "null",
+          total: { $sum: "$service.price" },
+        },
+      },
+    ]);
+
+    const verifiedServiceCounts = await serviceModel.countDocuments({
+      vendorId,
+      isVerified: true,
+    });
+    const unVerifiedServiceCounts = await serviceModel.countDocuments({
+      vendorId,
+      isVerified: false,
+    });
+
+    const totalbookings = await BookingModel.countDocuments({
+      vendorId,
+      status: "booked",
+    });
+
+    const data = {
+      totalCurrency: orderTotal.length > 0 ? orderTotal[0].total : 0,
+      verifiedService: verifiedServiceCounts,
+      unVerifiedService: unVerifiedServiceCounts,
+      bookings: totalbookings,
+    };
+
+    console.log(data, "vendor id issss");
+
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+ 
+
+
+
+
+
+
+
+
+
 
 
 
@@ -439,5 +505,8 @@ export {
   fetchService,
   addSlots,
   getOrders,
-  updateOrder
+  updateOrder,
+  dashboardData,
+  
+ 
 };

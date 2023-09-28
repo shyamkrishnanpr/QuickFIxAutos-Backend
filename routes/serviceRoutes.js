@@ -14,7 +14,9 @@ import {
   fetchService,
   addSlots,
   getOrders,
-  updateOrder
+  updateOrder,
+  dashboardData,
+ 
 } from "../controllers/serviceController.js";
 import{privateChat,getChatConversation,getConversations} from "../controllers/vendorChatController.js"
 const serviceRoute = express.Router();
@@ -42,6 +44,10 @@ serviceRoute.put("/updateOrder/:orderId/status",verification.verifyVendor,update
 serviceRoute.post('/chat-sendmessage/:vendorId/:userId',privateChat);
 serviceRoute.get('/chat-conversation/:vendorId/:userId',getChatConversation);
 serviceRoute.get('/chat-conversations/:vendorId',getConversations);
+
+
+serviceRoute.get('/dashboardDetails',verification.verifyVendor,dashboardData)
+
 
  
 export default serviceRoute;
