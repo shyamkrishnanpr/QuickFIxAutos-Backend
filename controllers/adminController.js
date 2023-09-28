@@ -526,10 +526,11 @@ const displayCharts = async (req, res, next) => {
       },
     ];
 
-    const serviceChart = await serviceModel.aggregate(pipeLine);
-    const bookingChart = await BookingModel.aggregate(pipeLine)
-    const usersChart = await UserModel.aggregate(pipeLine)
+    // const serviceChart = await serviceModel.aggregate(pipeLine);
+    // const bookingChart = await BookingModel.aggregate(pipeLine)
     const vendorChart = await VendorModel.aggregate(pipeLine)
+    const usersChart = await UserModel.aggregate(pipeLine)
+   
 
     res.json({
       serviceChart,
