@@ -22,7 +22,9 @@ import {
   verifyService,
   getAllService,
   addBanner,
-  banners
+  banners,
+  dashboardData,
+  displayCharts
 } from "../controllers/adminController.js";
 
 const adminRoute = express.Router();
@@ -55,6 +57,9 @@ adminRoute.get("/getAllService",verification.verifyAdmin,getAllService)
 
 adminRoute.post("/addBanner",upload.single('newBanner'),verification.verifyAdmin,addBanner)
 adminRoute.get("/getBanner",verification.verifyAdmin,banners)
+
+adminRoute.get("/dashboardData",verification.verifyAdmin,dashboardData)
+adminRoute.get("/dashboardChart",verification.verifyAdmin,displayCharts)
 
  
 
