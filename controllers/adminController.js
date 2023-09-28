@@ -21,7 +21,7 @@ const login = (req, res, next) => {
     ) {
       const payload = {
         email: email,
-        role:"admin"
+        role: "admin",
       };
 
       jwt.sign(
@@ -67,14 +67,12 @@ const addCategory = async (req, res, next) => {
   try {
     const category = req.body;
     console.log(category);
+    const check = category.category;
 
-    const existingCategory = await CategoryModel.findOne({category:category})
+    const existingCategory = await CategoryModel.findOne({ category: check });
     if (existingCategory) {
-      return res.status(400).json({ error: 'Category already exists.' });
+      return res.status(400).json({ error: "Category already exists." });
     }
-
-
-
     CategoryModel.create(category);
     res.json(category);
   } catch (error) {
@@ -86,12 +84,17 @@ const editCategory = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { newName } = req.body;
+    const existingCategory = await CategoryModel.findOne({ category:newName });
+    if (existingCategory) {
+      return res.status(400).json({ error: "Category name already exists." });
+    }
+   
     const category = await CategoryModel.findByIdAndUpdate(
       id,
       { category: newName },
       { new: true }
     );
-    return response;
+    res.json(category);
   } catch (error) {
     console.log(error);
   }
@@ -246,7 +249,7 @@ const getServices = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = 3;
     const skip = (page - 1) * pageSize;
-    const count = await serviceModel.find({isVerified:false}).count();
+    const count = await serviceModel.find({ isVerified: false }).count();
     const services = await serviceModel
       .find({ isVerified: false })
       .skip(skip)
@@ -256,7 +259,7 @@ const getServices = async (req, res, next) => {
       .populate("subCategoryId")
       .populate("vehicleId");
     // console.log("at cntrller",services)
-    res.json({services,count});
+    res.json({ services, count });
   } catch (error) {
     console.log(error);
   }
@@ -298,34 +301,31 @@ const getAllService = async (req, res, next) => {
   }
 };
 
-const addBanner = async(req,res,next)=>{
+const addBanner = async (req, res, next) => {
   try {
-    const banner = req.body
-    banner.bannerImage = req.file.filename
+    const banner = req.body;
+    banner.bannerImage = req.file.filename;
 
-    console.log(banner.bannerImage,"buuuu")
-    
-     await BannerModel.create(banner)
-     res.json(banner)
+    console.log(banner.bannerImage, "buuuu");
 
+    await BannerModel.create(banner);
+    res.json(banner);
 
-    console.log(banner,"add banner cntroller")
+    console.log(banner, "add banner cntroller");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-const banners = async(req,res,next)=>{
+const banners = async (req, res, next) => {
   try {
-    const banners = await BannerModel.find()
-    console.log(banners,"atb")
-    res.json(banners)
+    const banners = await BannerModel.find();
+    console.log(banners, "atb");
+    res.json(banners);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
-
-
+};
 
 export {
   login,
@@ -348,5 +348,5 @@ export {
   verifyService,
   getAllService,
   addBanner,
-  banners
+  banners,
 };
